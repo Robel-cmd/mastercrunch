@@ -30,8 +30,8 @@ class Database {
         // Al crear el objeto, cargamos los datos del .env (o valores por defecto si no existen)
         $this->host     = $_ENV['DB_HOST'] ?? 'localhost';
         $this->db_name  = $_ENV['DB_NAME'] ?? 'master_crunch_db';
-        $this->username = $_ENV['DB_USER'] ?? 'master';
-        $this->password = $_ENV['DB_PASS'] ?? '1234';
+        $this->username = $_ENV['DB_USER'] ?? 'root';
+        $this->password = $_ENV['DB_PASS'] ?? '';
     }
 
     public function getConnection() {
