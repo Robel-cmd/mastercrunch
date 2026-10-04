@@ -1,0 +1,7 @@
+# ============================================
+# Uploads - ignorar TODOS los archivos subidos
+# ============================================
+uploads/**/*
+!uploads/**/
+!uploads/**/.gitkeep
+!uploads/**/.gitignore

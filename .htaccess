@@ -1,0 +1,28 @@
+Options -Indexes
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+RewriteEngine On
+
+# Permitir acceso a la carpeta backEnd/api (y todo su contenido)
+RewriteRule ^backEnd/api(/.*)?$ - [L]
+
+# Denegar acceso a cualquier otra ruta dentro de backEnd o frontEnd
+RewriteRule ^backEnd(/.*)?$ - [F,L]
+RewriteRule ^frontEnd(/.*)?$ - [F,L]
+
+# Redirigir todas las peticiones no existentes a index.php (frontend)
+RewriteCond %{REQUEST_URI} !/index\.php$
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Ocultar extensión .php (para frontend)
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# Ocultar extensión .html
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [L]

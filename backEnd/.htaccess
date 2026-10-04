@@ -1,0 +1,10 @@
+# Sintaxis nativa de Apache 2.4+ para bloquear acceso web directo
+#<IfModule mod_authz_core.c>
+   #Require all denied
+#/IfModule>
+
+# Compatibilidad con servidores antiguos
+#<IfModule !mod_authz_core.c>
+    #Order deny,allow
+    #Deny from all
+#</IfModule>
