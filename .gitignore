@@ -5,3 +5,4 @@ uploads/**/*
 !uploads/**/
 !uploads/**/.gitkeep
 !uploads/**/.gitignore
+.env
