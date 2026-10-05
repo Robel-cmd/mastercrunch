@@ -44,6 +44,9 @@ function agregarAlCarrito(item, tipo = 'producto') {
     const existente = _carrito.find(c => c.nombre === item.nombre && c.tipo === tipo);
     if (existente) {
         existente.cantidad = Math.min(existente.cantidad + 1, 99);
+        if (typeof mostrarNotificacion === 'function') {
+            mostrarNotificacion(`Cantidad de "${item.nombre}" actualizada a ${existente.cantidad}`, 'success');
+        }
     } else {
         _carrito.push({
             nombre: item.nombre,
@@ -52,6 +55,9 @@ function agregarAlCarrito(item, tipo = 'producto') {
             nota: '',
             tipo: tipo
         });
+        if (typeof mostrarNotificacion === 'function') {
+            mostrarNotificacion(`Se agregó "${item.nombre}" a la lista`, 'success');
+        }
     }
     renderCarrito();
 }

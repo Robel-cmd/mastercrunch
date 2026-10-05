@@ -225,3 +225,5 @@
         <span class="pedidos-toggle-label">Pedidos</span>
     </button>
 </div>
+<!-- Poput -->
+<div class="notification" id="notificaion-poput" popover="manual" role="status" aria-live="polite"></div>
