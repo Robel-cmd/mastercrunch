@@ -58,7 +58,7 @@ function initCategorias() {
                     <div class="card-content">
                         <div class="card-title">${item.nombre}</div>
                         <div class="card-value">${item.descripcion}</div>
-                        <div class="card-title ${esactivo}">${textoEstadoVisual}</div>
+                        <div class="card-estado ${esactivo}">${textoEstadoVisual}</div>
                     </div>
                     <div class="card-actions">
                         <button type="button" class="btn btn-edit btn-editar-cat" data-id="${item.id_categoria}">Editar</button>
