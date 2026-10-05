@@ -4,17 +4,35 @@
 </header>
 
 <!--BARRA DE BÚSQUEDA GLOBAL-->
-<section class="container-secondary toolbar-catalogo">
-    <div class="header-card-container" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+<section class="container-secondary seccion-categorias-sticky">
+    <div class="header-card-container categorias-header">
         <div class="header-left">
             <div class="icon-image">
-                <i class='bx bx-search-alt-2'></i>
-                <span class="titulo">Búsqueda global</span>
+                <i class='bx bx-category-alt'></i>
+                <span class="titulo">Listado de categorías</span>
             </div>
-            <div class="search-general">
-                <i class='bx bx-search-alt-2'></i>
-                <input type="search" placeholder="Buscar..." id="buscador-global">
-            </div>
+        </div>
+
+        <div class="header-actions-group">
+            <!-- Toggle del buscador -->
+            <button class="btn-toggle-icon" id="btn-toggle-search" aria-expanded="true" title="Buscar">
+                <i class='bx bx-search'></i>
+                <i class='bx bx-chevron-down toggle-arrow'></i>
+            </button>
+
+            <!-- Toggle de categorías -->
+            <button class="btn-toggle-icon" id="btn-toggle-cats" aria-expanded="true" title="Categorías">
+                <i class='bx bx-category'></i>
+                <i class='bx bx-chevron-down toggle-arrow'></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bloque colapsable: buscador global -->
+    <div class="search-bar-collapsible open" id="search-bar-collapsible">
+        <div class="search-general">
+            <i class='bx bx-search-alt-2'></i>
+            <input type="search" placeholder="Buscar en categorías, catálogo y tabla..." id="buscador-global">
         </div>
         <div class="button-general" id="btn-filtros">
             <a>
@@ -23,23 +41,14 @@
             </a>
         </div>
     </div>
-</section>
 
-
-<!--SECCIÓN DE CATEGORÍAS-->
-<section class="container-secondary">
-    <div class="header-card-container">
-        <div class="icon-image">
-            <i class='bx bx-category-alt'></i>
-            <span class="titulo">Listado de categorías</span>
+    <!-- Bloque colapsable: carrusel de categorías -->
+    <div class="cats-collapsible open" id="cats-collapsible">
+        <div class="cats-collapsible-inner">
+            <div class="carrusel-categorias" id="categorias-container"></div>
+            <div class="paginacion" id="paginacion-catalogo-categorias"></div>
         </div>
     </div>
-
-    <div class="carrusel-categorias" id="categorias-container">
-        <!-- Aquí se generarán dinámicamente las categorías -->
-    </div>
-
-    <div class="paginacion" id="paginacion-catalogo-categorias"></div>
 </section>
 
 

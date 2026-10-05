@@ -41,6 +41,7 @@ function ajax(url) {
                 initCategoriasCatalogo();
                 initCatalogoAPI();
                 initTooglePanel();
+                initToggleBuscador();
             }
         } else {
             console.error("Error en la petición AJAX. Estado:", this.status, "URL:", url);

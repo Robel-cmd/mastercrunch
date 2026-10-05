@@ -48,3 +48,31 @@ function initTooglePanel() {
         });
     });
 }
+
+/* Buscador colapsable categorías */
+function initToggleBuscador() {
+    const btnSearch = document.getElementById('btn-toggle-search');
+    const btnCats   = document.getElementById('btn-toggle-cats');
+    const searchBar = document.getElementById('search-bar-collapsible');
+    const catsBlock = document.getElementById('cats-collapsible');
+
+    if (!btnSearch || !searchBar) return;
+
+    const esMovil = window.matchMedia('(max-width: 768px)').matches;
+    if (esMovil) {
+        searchBar.classList.remove('open');
+        btnSearch.setAttribute('aria-expanded', 'false');
+    }
+
+    btnSearch.addEventListener('click', () => {
+        const abierto = searchBar.classList.toggle('open');
+        btnSearch.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    });
+
+    if (btnCats && catsBlock) {
+        btnCats.addEventListener('click', () => {
+            const abierto = catsBlock.classList.toggle('open');
+            btnCats.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+        });
+    }
+}
