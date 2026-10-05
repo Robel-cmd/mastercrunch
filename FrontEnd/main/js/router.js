@@ -42,6 +42,9 @@ function ajax(url) {
                 initCatalogoAPI();
                 initTooglePanel();
                 initToggleBuscador();
+                if (typeof initCarrito === 'function') initCarrito();
+                if (typeof initCatalogoItems === 'function') initCatalogoItems();
+                if (typeof initModalComboCatalogo === 'function') initModalComboCatalogo();
             }
         } else {
             console.error("Error en la petición AJAX. Estado:", this.status, "URL:", url);

@@ -125,12 +125,14 @@
     display: flex;
     flex-direction: row;
     gap: 20px;
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: hidden;
     padding-top: 8px;
     padding-bottom: 10px;
     width: 100%;
     margin-top: 8px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
 }
 
 .carrusel-categorias::-webkit-scrollbar {
@@ -174,6 +176,12 @@
     border-color: var(--primary-color);
 }
 
+.categoria-card-catalogo.selected {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 35%, transparent);
+    background-color: color-mix(in srgb, var(--primary-color) 6%, var(--card-background-color));
+}
+
 .categoria-card-catalogo img {
     grid-column: 1;
     grid-row: 1 / -1;
@@ -214,12 +222,65 @@
     overflow: hidden;
 }
 
-/*Grid de productos*/
+/* Grid de productos*/
 .grid-productos {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
     gap: 16px;
     margin-top: 20px;
+}
+
+/* Filtros: todos / productos / combos */
+.filtros-catalogo {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+.chip-filtro {
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.chip-filtro:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+.chip-filtro.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Tarjeta de combo: fondo distinto para diferenciarlo */
+.producto-card.combo-card {
+    background-color: color-mix(in srgb, var(--primary-color) 8%, var(--card-background-color));
+    border-left: 3px solid var(--primary-color);
+}
+.producto-card.combo-card:hover {
+    border-color: var(--primary-color);
+}
+/* Indicador visual de combo en la imagen */
+.producto-card.combo-card img {
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--primary-color) 30%, transparent);
+}
+
+/* Tarjeta de extra: señalado en verde, igual de distintivo que combos */
+.producto-card.extra-card {
+    background-color: color-mix(in srgb, var(--positive-color) 8%, var(--card-background-color));
+    border-left: 3px solid var(--positive-color);
+}
+.producto-card.extra-card:hover {
+    border-color: var(--positive-color);
+}
+.producto-card.extra-card img {
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--positive-color) 30%, transparent);
 }
 
 /*Tarjeta de producto*/
@@ -356,6 +417,35 @@
 .pedido-item:hover {
     border-color: var(--primary-color);
 }
+
+/*Diferenciación sutil por tipo de ítem en la lista*/
+.pedido-item--combo { border-left: 3px solid var(--primary-color); }
+.pedido-item--extra { border-left: 3px solid var(--positive-color); }
+.pedido-item--producto { border-left: 3px solid var(--border-color); }
+
+.pedido-tipo {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+}
+.pedido-tipo-combo {
+    background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: var(--primary-color);
+}
+.pedido-tipo-extra {
+    background-color: color-mix(in srgb, var(--positive-color) 12%, transparent);
+    color: var(--positive-color);
+}
+.pedido-tipo-producto {
+    background-color: color-mix(in srgb, var(--border-color) 55%, transparent);
+    color: var(--text-color);
+}
 .pedido-item .btn-eliminar {
     background: transparent;
     border: none;
@@ -408,6 +498,7 @@
 .item-precio-cantidad .precio {
     font-size: 0.9rem;
     font-weight: 700;
+    color: var(--primary-color);
     color: var(--primary-color);
 }
 
@@ -574,8 +665,10 @@
         grid-template-columns: 1fr;
     }
     .resumen-pedidos-agregados {
+        /* En pantallas no-grandes no se extiende indefinidamente:
+           mantiene altura acotada con scroll, tipo parejo al catálogo */
         position: static;
-        max-height: none;
+        max-height: 480px;
     }
     .toolbar-catalogo {
         position: static;
@@ -962,4 +1055,34 @@
     .pedidos-toggle-btn {
         align-self: flex-start;
     }
+}
+
+/*Modal detalle de combo*/
+.combo-detalle {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.combo-detalle-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.combo-detalle-lista li {
+    padding: 6px 10px;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--text-color);
+}
+.combo-detalle-precio {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-color);
+    text-align: right;
+    margin-top: 4px;
 }

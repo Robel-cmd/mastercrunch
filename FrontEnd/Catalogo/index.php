@@ -34,12 +34,6 @@
             <i class='bx bx-search-alt-2'></i>
             <input type="search" placeholder="Buscar en categorías, catálogo y tabla..." id="buscador-global">
         </div>
-        <div class="button-general" id="btn-filtros">
-            <a>
-                <i class='bx bx-filter-alt'></i>
-                <span>Filtros</span>
-            </a>
-        </div>
     </div>
 
     <!-- Bloque colapsable: carrusel de categorías -->
@@ -65,6 +59,13 @@
             </div>
         </div>
 
+        <div class="filtros-catalogo">
+            <button class="chip-filtro active" data-filtro="todos" type="button">Todos</button>
+            <button class="chip-filtro" data-filtro="productos" type="button">Productos</button>
+            <button class="chip-filtro" data-filtro="combos" type="button">Combos</button>
+            <button class="chip-filtro" data-filtro="extras" type="button">Extras</button>
+        </div>
+
         <div class="grid-productos" id="catalogo-container">
             <!-- Los productos se cargarán dinámicamente aquí -->
         </div>
@@ -80,22 +81,7 @@
         </header>
 
         <div class="lista-pedido" id="lista-pedido">
-            <article class="pedido-item">
-                <div class="item-header">
-                    <h4>Nombre producto</h4>
-                    <button class="btn-eliminar">🗑️</button>
-                </div>
-                <div class="item-precio-cantidad">
-                    <span class="precio">200.00 Lps</span>
-                    <div class="controles-cantidad">
-                        <button>-</button>
-                        <span>1</span>
-                        <button>+</button>
-                    </div>
-                </div>
-                <input type="text" placeholder="Nota adicional de producto" class="input-nota">
-            </article>
-            <!-- ... más items ... -->
+            <!-- Los productos agregados se renderizan dinámicamente aquí -->
         </div>
 
         <footer class="acciones-pedido">
@@ -105,6 +91,63 @@
     </aside>
 </div>
 
+
+<!-- CONFIRMACIONES PEDIDO -->
+
+<!-- Borrar lista -->
+<dialog class="warning-modal" id="warning-modal-borrar-lista">
+    <header class="check-tittle warning">
+        <div class="conteiner-icon warning">
+            <i class='bx bx-error'></i>
+        </div>
+    </header>
+    <section class="content-priority">
+        <p class="description-priority">
+            <strong>¿Está seguro que quiere borrar toda la lista?</strong><br>
+            Los productos agregados se eliminarán.
+        </p>
+        <div>
+            <button class="cancelar-desactivar" id="cancelar-borrar-lista">No, regresar</button>
+            <button class="confirmar-desactivar" id="confirmar-borrar-lista">Sí, borrar</button>
+        </div>
+    </section>
+</dialog>
+
+<!-- Facturar (solo visual por ahora) -->
+<dialog class="warning-modal" id="modal-confirmacion-facturar">
+    <header class="check-tittle warning">
+        <div class="conteiner-icon warning">
+            <i class='bx bx-receipt'></i>
+        </div>
+    </header>
+    <section class="content-priority">
+        <p class="description-priority">
+            Facturar estará disponible próximamente.
+        </p>
+        <div>
+            <button class="confirmar-desactivar" id="aceptar-modal-facturar">Aceptar</button>
+        </div>
+    </section>
+</dialog>
+
+<!-- Modal de detalle de combo -->
+<dialog class="modal" id="modal-combo-catalogo">
+    <header class="modal-header">
+        <h2 class="modal-title" id="combo-modal-titulo">Combo</h2>
+        <button class="modal-close" id="btn-close-combo-catalogo">X</button>
+    </header>
+    <section class="modal-content">
+        <div class="combo-detalle">
+            <p id="combo-modal-descripcion"></p>
+            <ul id="combo-modal-lista" class="combo-detalle-lista"></ul>
+            <p id="combo-modal-precio" class="combo-detalle-precio"></p>
+        </div>
+        <div class="contenido-botones-modal">
+            <button class="emergente-btn" id="btn-cancel-combo-catalogo">Cancelar</button>
+            <button class="confirm-btn" id="btn-agregar-combo-catalogo">Agregar</button>
+        </div>
+    </section>
+</dialog>
 
 <!--PANEL FLOTANTE DE PEDIDOS-->
 <div class="pedidos-flotante" id="pedidos-flotante">

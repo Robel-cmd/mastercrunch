@@ -47,7 +47,7 @@ function initCategoriasCatalogo() {
             const descripcion = item.descripcion || '';
 
             html += `
-                <article class="categoria-card-catalogo" data-nombre="${item.nombre}" data-id="${item.id}">
+                <article class="categoria-card-catalogo" data-nombre="${item.nombre}" data-id="${item.id_categoria ?? item.id}">
                     <img src="${urlImagen}" alt="Imagen de ${item.nombre}">
                     <h3>${item.nombre}</h3>
                     <p>${descripcion}</p>
@@ -71,19 +71,45 @@ function initCategoriasCatalogo() {
         if (_categoriasMostradas.length > 0) renderizarCategorias(_categoriasMostradas);
     });
 
-    // Cargar categorías
+    // Cargar categorías (el filtro de texto se aplica en el render)
     function fetchCategorias() {
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 const registros = Array.isArray(data) ? data : (data.registros || []);
-                renderizarCategorias(registros);
+                _todasLasCategorias = registros;
+                renderConFiltroTexto();
             })
             .catch(error => {
                 console.error('Error al obtener las categorías:', error);
+                _todasLasCategorias = [];
                 renderizarCategorias([]);
             });
     }
+
+    let _todasLasCategorias = [];
+
+    // Aplica el texto del buscador global al carrusel de categorías
+    function renderConFiltroTexto() {
+        const texto = ((window._catalogoFiltros && window._catalogoFiltros.texto) || '')
+            .trim().toLowerCase();
+        const filtradas = !texto
+            ? _todasLasCategorias
+            : _todasLasCategorias.filter(c =>
+                String(c.nombre || '').toLowerCase().includes(texto) ||
+                String(c.descripcion || '').toLowerCase().includes(texto)
+              );
+        renderizarCategorias(filtradas);
+
+        // Mantener la categoría activa visualmente tras un re-render
+        const activa = window._catalogoFiltros && window._catalogoFiltros.categoria;
+        if (activa) {
+            const tag = document.querySelector(`.categoria-card-catalogo[data-nombre="${activa}"]`);
+            if (tag) tag.classList.add('selected');
+        }
+    }
+
+    window.addEventListener('catalogo:texto', renderConFiltroTexto);
 
     fetchCategorias();
     window.registerPoll(fetchCategorias, 5000);
