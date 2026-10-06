@@ -27,6 +27,13 @@ function renderPaginacion(container, paginaActual, totalItems, porPagina, onChan
     if (!container) return 1;
 
     const totalPaginas = Math.max(1, Math.ceil(totalItems / porPagina));
+
+    // Una sola página: no mostrar controles
+    if (totalPaginas <= 1) {
+        container.innerHTML = '';
+        return 1;
+    }
+
     let html = '';
 
     html += `<button data-page="${paginaActual - 1}" ${paginaActual <= 1 ? 'disabled' : ''}>&lt;</button>`;

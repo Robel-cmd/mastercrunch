@@ -4,42 +4,45 @@
 </header>
 
 <!--BARRA DE BÚSQUEDA GLOBAL-->
-<section class="container-secondary toolbar-catalogo">
-    <div class="header-card-container" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+<section class="container-secondary seccion-categorias-sticky">
+    <div class="header-card-container categorias-header">
         <div class="header-left">
             <div class="icon-image">
-                <i class='bx bx-search-alt-2'></i>
-                <span class="titulo">Búsqueda global</span>
-            </div>
-            <div class="search-general">
-                <i class='bx bx-search-alt-2'></i>
-                <input type="search" placeholder="Buscar..." id="buscador-global">
+                <i class='bx bx-category-alt'></i>
+                <span class="titulo">Listado de categorías</span>
             </div>
         </div>
-        <div class="button-general" id="btn-filtros">
-            <a>
-                <i class='bx bx-filter-alt'></i>
-                <span>Filtros</span>
-            </a>
-        </div>
-    </div>
-</section>
 
+        <div class="header-actions-group">
+            <!-- Toggle del buscador -->
+            <button class="btn-toggle-icon" id="btn-toggle-search" aria-expanded="true" title="Buscar">
+                <i class='bx bx-search'></i>
+                <i class='bx bx-chevron-down toggle-arrow'></i>
+            </button>
 
-<!--SECCIÓN DE CATEGORÍAS-->
-<section class="container-secondary">
-    <div class="header-card-container">
-        <div class="icon-image">
-            <i class='bx bx-category-alt'></i>
-            <span class="titulo">Listado de categorías</span>
+            <!-- Toggle de categorías -->
+            <button class="btn-toggle-icon" id="btn-toggle-cats" aria-expanded="true" title="Categorías">
+                <i class='bx bx-category'></i>
+                <i class='bx bx-chevron-down toggle-arrow'></i>
+            </button>
         </div>
     </div>
 
-    <div class="carrusel-categorias" id="categorias-container">
-        <!-- Aquí se generarán dinámicamente las categorías -->
+    <!-- Bloque colapsable: buscador global -->
+    <div class="search-bar-collapsible open" id="search-bar-collapsible">
+        <div class="search-general">
+            <i class='bx bx-search-alt-2'></i>
+            <input type="search" placeholder="Buscar en categorías, catálogo y tabla..." id="buscador-global">
+        </div>
     </div>
 
-    <div class="paginacion" id="paginacion-catalogo-categorias"></div>
+    <!-- Bloque colapsable: carrusel de categorías -->
+    <div class="cats-collapsible open" id="cats-collapsible">
+        <div class="cats-collapsible-inner">
+            <div class="carrusel-categorias" id="categorias-container"></div>
+            <div class="paginacion" id="paginacion-catalogo-categorias"></div>
+        </div>
+    </div>
 </section>
 
 
@@ -54,6 +57,13 @@
                 <i class='bx bx-package'></i>
                 <span class="titulo">Catálogo de productos</span>
             </div>
+        </div>
+
+        <div class="filtros-catalogo">
+            <button class="chip-filtro active" data-filtro="todos" type="button">Todos</button>
+            <button class="chip-filtro" data-filtro="productos" type="button">Productos</button>
+            <button class="chip-filtro" data-filtro="combos" type="button">Combos</button>
+            <button class="chip-filtro" data-filtro="extras" type="button">Extras</button>
         </div>
 
         <div class="grid-productos" id="catalogo-container">
@@ -71,22 +81,7 @@
         </header>
 
         <div class="lista-pedido" id="lista-pedido">
-            <article class="pedido-item">
-                <div class="item-header">
-                    <h4>Nombre producto</h4>
-                    <button class="btn-eliminar">🗑️</button>
-                </div>
-                <div class="item-precio-cantidad">
-                    <span class="precio">200.00 Lps</span>
-                    <div class="controles-cantidad">
-                        <button>-</button>
-                        <span>1</span>
-                        <button>+</button>
-                    </div>
-                </div>
-                <input type="text" placeholder="Nota adicional de producto" class="input-nota">
-            </article>
-            <!-- ... más items ... -->
+            <!-- Los productos agregados se renderizan dinámicamente aquí -->
         </div>
 
         <footer class="acciones-pedido">
@@ -96,6 +91,63 @@
     </aside>
 </div>
 
+
+<!-- CONFIRMACIONES PEDIDO -->
+
+<!-- Borrar lista -->
+<dialog class="warning-modal" id="warning-modal-borrar-lista">
+    <header class="check-tittle warning">
+        <div class="conteiner-icon warning">
+            <i class='bx bx-error'></i>
+        </div>
+    </header>
+    <section class="content-priority">
+        <p class="description-priority">
+            <strong>¿Está seguro que quiere borrar toda la lista?</strong><br>
+            Los productos agregados se eliminarán.
+        </p>
+        <div>
+            <button class="cancelar-desactivar" id="cancelar-borrar-lista">No, regresar</button>
+            <button class="confirmar-desactivar" id="confirmar-borrar-lista">Sí, borrar</button>
+        </div>
+    </section>
+</dialog>
+
+<!-- Facturar (solo visual por ahora) -->
+<dialog class="warning-modal" id="modal-confirmacion-facturar">
+    <header class="check-tittle warning">
+        <div class="conteiner-icon warning">
+            <i class='bx bx-receipt'></i>
+        </div>
+    </header>
+    <section class="content-priority">
+        <p class="description-priority">
+            Facturar estará disponible próximamente.
+        </p>
+        <div>
+            <button class="confirmar-desactivar" id="aceptar-modal-facturar">Aceptar</button>
+        </div>
+    </section>
+</dialog>
+
+<!-- Modal de detalle de combo -->
+<dialog class="modal" id="modal-combo-catalogo">
+    <header class="modal-header">
+        <h2 class="modal-title" id="combo-modal-titulo">Combo</h2>
+        <button class="modal-close" id="btn-close-combo-catalogo">X</button>
+    </header>
+    <section class="modal-content">
+        <div class="combo-detalle">
+            <p id="combo-modal-descripcion"></p>
+            <ul id="combo-modal-lista" class="combo-detalle-lista"></ul>
+            <p id="combo-modal-precio" class="combo-detalle-precio"></p>
+        </div>
+        <div class="contenido-botones-modal">
+            <button class="emergente-btn" id="btn-cancel-combo-catalogo">Cancelar</button>
+            <button class="confirm-btn" id="btn-agregar-combo-catalogo">Agregar</button>
+        </div>
+    </section>
+</dialog>
 
 <!--PANEL FLOTANTE DE PEDIDOS-->
 <div class="pedidos-flotante" id="pedidos-flotante">
@@ -173,3 +225,5 @@
         <span class="pedidos-toggle-label">Pedidos</span>
     </button>
 </div>
+<!-- Poput -->
+<div class="notification" id="notificaion-poput" popover="manual" role="status" aria-live="polite"></div>

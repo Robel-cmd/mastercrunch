@@ -164,6 +164,7 @@ $base_url = ($pos !== false) ? substr($script_path, 0, $pos) . '/FrontEnd' : '';
     <script src="<?php echo $base_url; ?>/Catalogo/js/categoriasCat.js"></script>
     <script src="<?php echo $base_url; ?>/Catalogo/js/catalogoProdAPI.js"></script>
     <script src="<?php echo $base_url; ?>/Catalogo/js/tooglePanel.js"></script>
+    <script src="<?php echo $base_url; ?>/Catalogo/js/catalogoCarrito.js"></script>
 
 </body>
 </html>

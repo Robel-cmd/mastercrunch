@@ -90,13 +90,9 @@ function initCombo() {
                 item.detalles.forEach(itemDetalle => {
                     detallesContent += `
                         <div class="card-list detalle">
-                            <label>
-                                <strong>
-                                    <strong class="cant-detalle-combo">x${itemDetalle.cantidad}</strong>
-                                    &nbsp;&nbsp;&nbsp;&nbsp; ${itemDetalle.producto_nombre}
-                                </strong>
-                                <strong class="detalle-precio">&nbsp;&nbsp;Lps.${itemDetalle.precio_individual}</strong>
-                            </label>
+                            <span class="cant-detalle-combo">x${itemDetalle.cantidad}</span>
+                            <span class="nombre-detalle">${itemDetalle.producto_nombre}</span>
+                            <span class="detalle-precio">Lps.${itemDetalle.precio_individual}</span>
                         </div>
                     `;
                 });
@@ -115,10 +111,10 @@ function initCombo() {
                         </div>
                     </div>
                     <div class="card-content">
-                        <div class="card-title ${claseActivo}">${textoEstadoVisual}</div>
-                        <div class="card-title"><strong>${item.nombre}</strong></div>
+                        <div class="card-title">${item.nombre}</div>
                         <div class="card-value precio-combo">Lps.${item.precio_total}</div>
-                        <div class="card-title detalles">${detallesContent}</div>
+                        <div class="detalles">${detallesContent}</div>
+                        <div class="card-estado ${claseActivo}">${textoEstadoVisual}</div>
                     </div>
                     <div class="card-actions">
                         <div class="btn btn-edit button-editar btn-combo-edit" data-id="${item.id_combo}" id="editar-combo">Editar</div>

@@ -5,4 +5,5 @@ uploads/**/*
 !uploads/**/
 !uploads/**/.gitkeep
 !uploads/**/.gitignore
+.opencode/**
 .env
