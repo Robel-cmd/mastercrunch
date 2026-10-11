@@ -217,7 +217,7 @@ CREATE TABLE `pedidos` (
   `fecha_hora_entrega` datetime DEFAULT NULL,
   `cliente` varchar(100) NOT NULL DEFAULT 'Cliente no especificado',
   `id_empleado` int(11) NOT NULL,
-  `estado` varchar(30) NOT NULL DEFAULT 'pendiente',
+  `estado` enum('recibido','pendiente','preparacion','entregado','cancelado') NOT NULL DEFAULT 'pendiente',
   `tipo_pedido` varchar(30) NOT NULL,
   `observaciones` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -275,6 +275,23 @@ CREATE TABLE `pedidos_detalle` (
 -- (15, 8, NULL, 1, 1, 25.00),
 -- (16, 10, 1, 2, 1, 120.00),
 -- (17, 10, 1, 2, 1, 25.00);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `ordenes_cocina`
+-- El detalle de productos ya vive en `pedidos_detalle`, aquí solo se
+-- controla el estado de preparación del pedido en cocina.
+--
+
+CREATE TABLE `ordenes_cocina` (
+  `id_orden_cocina` int(11) NOT NULL,
+  `id_pedido` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1,
+  `estado_cocina` enum('pendiente','preparacion','entregado','cancelado') NOT NULL DEFAULT 'pendiente',
+  `hora_recibido` datetime DEFAULT NULL,
+  `hora_entrega` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -387,6 +404,13 @@ ALTER TABLE `metodo_pago`
   ADD PRIMARY KEY (`id_metodo_pago`);
 
 --
+-- Indices de la tabla `ordenes_cocina`
+--
+ALTER TABLE `ordenes_cocina`
+  ADD PRIMARY KEY (`id_orden_cocina`),
+  ADD KEY `fk_ordenescocina_pedido` (`id_pedido`);
+
+--
 -- Indices de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
@@ -468,6 +492,12 @@ ALTER TABLE `metodo_pago`
   MODIFY `id_metodo_pago` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `ordenes_cocina`
+--
+ALTER TABLE `ordenes_cocina`
+  MODIFY `id_orden_cocina` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
@@ -530,6 +560,12 @@ ALTER TABLE `metas_diarias`
   ADD CONSTRAINT `fk_metasdiarias_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Filtros para la tabla `ordenes_cocina`
+--
+ALTER TABLE `ordenes_cocina`
+  ADD CONSTRAINT `fk_ordenescocina_pedido` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
@@ -541,7 +577,9 @@ ALTER TABLE `pedidos`
 ALTER TABLE `pedidos_detalle`
   ADD CONSTRAINT `fk_pedidosdet_combo` FOREIGN KEY (`id_combo`) REFERENCES `combo` (`id_combo`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_pedidosdet_pedido` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_pedidosdet_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_pedidosdet_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `chk_pedidosdet_cantidad` CHECK (`cantidad` > 0),
+  ADD CONSTRAINT `chk_pedidosdet_precio` CHECK (`precio_unitario` >= 0);
 
 --
 -- Filtros para la tabla `productos`

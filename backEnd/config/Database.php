@@ -16,7 +16,7 @@ function cargarVariablesEntorno($ruta) {
 }
 
 // Ejecutamos la lectura del archivo .env
-cargarVariablesEntorno(__DIR__ . '../../.env');
+cargarVariablesEntorno(__DIR__ . '/../../.env');
 
 class Database {
     // 2. Ahora las variables ya no tienen los datos fijos, leen el .env

@@ -19,11 +19,7 @@ class DetallePedController {
     }
 
     private function isValidCantidad($value) {
-        return is_numeric($value) && (int)$value > 0 && (string)(int)$value === (string)$value;
-    }
-
-    private function isValidPrecio($value) {
-        return is_numeric($value) && (float)$value >= 0;
+        return DetallePedido::isValidCantidadValue($value);
     }
 
     public function create(){
@@ -39,20 +35,19 @@ class DetallePedController {
         $idProducto = isset($data->id_producto) ? $data->id_producto : null;
         $idCombo = isset($data->id_combo) ? $data->id_combo : null;
         $cantidad = isset($data->cantidad) ? $data->cantidad : null;
-        $precioUnitario = isset($data->precio_unitario) ? $data->precio_unitario : null;
 
         $hasProducto = $idProducto !== null && $idProducto !== '';
         $hasCombo = $idCombo !== null && $idCombo !== '';
 
+        // precio_unitario ya NO se recibe: lo fija el servidor con el precio vigente.
         if (
             !$this->isValidId($idPedido) ||
             ($hasProducto === $hasCombo) ||
-            !$this->isValidCantidad($cantidad) ||
-            !$this->isValidPrecio($precioUnitario)
+            !$this->isValidCantidad($cantidad)
         ) {
             http_response_code(400);
             echo json_encode([
-                "message" => "Datos inválidos. Debe enviar id_pedido válido, uno solo entre id_producto e id_combo, cantidad > 0 y precio_unitario >= 0."
+                "message" => "Datos inválidos. Debe enviar id_pedido válido, uno solo entre id_producto e id_combo y cantidad entera >= 1."
             ]);
             return;
         }
@@ -73,16 +68,20 @@ class DetallePedController {
         $this->detalle->id_producto = $hasProducto ? $idProducto : null;
         $this->detalle->id_combo = $hasCombo ? $idCombo : null;
         $this->detalle->cantidad = (int)$cantidad;
-        $this->detalle->precio_unitario = (float)$precioUnitario;
 
         if ($this->detalle->create()) {
             http_response_code(201);
-            echo json_encode(["message" => "detalle creado exitosamente"]);
+            echo json_encode([
+                "message" => "detalle creado exitosamente",
+                "id_pedido" => (int)$idPedido,
+                "cantidad" => (int)$cantidad,
+                "precio_unitario" => $this->detalle->precio_unitario
+            ]);
             return;
         }
 
-        http_response_code(503);
-        echo json_encode(["message" => "No se pudo crear el detalle"]);
+        http_response_code(400);
+        echo json_encode(["message" => "No se pudo crear el detalle. Verifique que el producto o combo exista."]);
     }
 
     public function read()
@@ -190,7 +189,6 @@ class DetallePedController {
         $idProducto = isset($data->id_producto) ? $data->id_producto : null;
         $idCombo = isset($data->id_combo) ? $data->id_combo : null;
         $cantidad = isset($data->cantidad) ? $data->cantidad : null;
-        $precioUnitario = isset($data->precio_unitario) ? $data->precio_unitario : null;
 
         if (!$this->isValidId($idPedido)) {
             http_response_code(400);
@@ -201,10 +199,11 @@ class DetallePedController {
         $hasProducto = $idProducto !== null && $idProducto !== '';
         $hasCombo = $idCombo !== null && $idCombo !== '';
 
-        if (($hasProducto === $hasCombo) || !$this->isValidCantidad($cantidad) || !$this->isValidPrecio($precioUnitario)) {
+        // precio_unitario se ignora: lo resuelve el servidor.
+        if (($hasProducto === $hasCombo) || !$this->isValidCantidad($cantidad)) {
             http_response_code(400);
             echo json_encode([
-                "message" => "Datos inválidos. Debe definir uno solo entre id_producto e id_combo, cantidad > 0 y precio_unitario >= 0."
+                "message" => "Datos inválidos. Debe definir uno solo entre id_producto e id_combo y cantidad entera >= 1."
             ]);
             return;
         }
@@ -226,16 +225,18 @@ class DetallePedController {
         $this->detalle->id_producto = $hasProducto ? $idProducto : null;
         $this->detalle->id_combo = $hasCombo ? $idCombo : null;
         $this->detalle->cantidad = (int)$cantidad;
-        $this->detalle->precio_unitario = (float)$precioUnitario;
 
         if ($this->detalle->update()) {
             http_response_code(200);
-            echo json_encode(["message" => "detalle actualizado exitosamente"]);
+            echo json_encode([
+                "message" => "detalle actualizado exitosamente",
+                "precio_unitario" => $this->detalle->precio_unitario
+            ]);
             return;
         }
 
-        http_response_code(503);
-        echo json_encode(["message" => "No se pudo actualizar el detalle"]);
+        http_response_code(400);
+        echo json_encode(["message" => "No se pudo actualizar el detalle. Verifique que el producto o combo exista."]);
     }
 
     public function delete()
