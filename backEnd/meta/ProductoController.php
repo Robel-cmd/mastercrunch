@@ -7,16 +7,41 @@ class ProductoController {
     private $db;
     private $producto;
     private $upload_dir;
+    private $default_dir;
+    private $default_image_url = '/uploads/default/default-image.jpg.jpeg';
 
     public function __construct() {
         $database = new Database();
         $this->db = $database->getConnection();
         $this->producto = new Producto($this->db);
-        // Ruta a la carpeta uploads/productos 
+
+        // Carpeta para imágenes de productos
         $this->upload_dir = __DIR__ . '/../../uploads/productos/';
         if (!is_dir($this->upload_dir)) {
             mkdir($this->upload_dir, 0777, true);
         }
+
+        // Carpeta para la imagen por defecto
+        $this->default_dir = __DIR__ . '/../../uploads/default/';
+        if (!is_dir($this->default_dir)) {
+            mkdir($this->default_dir, 0777, true);
+        }
+    }
+
+    /**
+     * Verifica si el archivo de imagen existe en disco.
+     * Si no existe (o viene vacío), retorna la URL por defecto.
+     */
+    private function resolverImagen($imagen) {
+        if (empty($imagen)) {
+            return $this->default_image_url;
+        }
+        // La ruta guardada es relativa a la raíz del proyecto (ej: uploads/productos/xxx.png)
+        $ruta_disco = __DIR__ . '/../../' . ltrim($imagen, '/');
+        if (file_exists($ruta_disco)) {
+            return $imagen;
+        }
+        return $this->default_image_url;
     }
 
     private function getInputData() {
@@ -56,7 +81,14 @@ class ProductoController {
         $this->producto->nombre         = $data['nombre'];
         $this->producto->precio         = $data['precio'];
         $this->producto->id_categoria   = $data['id_categoria'];
-        $this->producto->url_imagen     = isset($data['url_imagen']) ? $data['url_imagen'] : null;
+
+        // Si no se subió imagen, se usa la URL por defecto
+        if (isset($data['url_imagen']) && !empty($data['url_imagen'])) {
+            $this->producto->url_imagen = $data['url_imagen'];
+        } else {
+            $this->producto->url_imagen = $this->default_image_url;
+        }
+
         $this->producto->disponibilidad = isset($data['disponibilidad']) ? $data['disponibilidad'] : 1;
         $this->producto->es_extra       = isset($data['es_extra']) ? $data['es_extra'] : 0;
 
@@ -83,7 +115,7 @@ class ProductoController {
                     "precio"           => $precio,
                     "id_categoria"     => $id_categoria,
                     "categoria_nombre" => $categoria_nombre,
-                    "url_imagen"       => $url_imagen,
+                    "url_imagen"       => $this->resolverImagen($url_imagen),
                     "disponibilidad"   => $disponibilidad,
                     "es_extra"         => $es_extra,
                     "fecha_creacion"   => $fecha_creacion
@@ -106,6 +138,7 @@ class ProductoController {
         }
         $producto = $this->producto->readOne($id);
         if ($producto) {
+            $producto['url_imagen'] = $this->resolverImagen($producto['url_imagen']);
             http_response_code(200);
             echo json_encode($producto);
         } else {

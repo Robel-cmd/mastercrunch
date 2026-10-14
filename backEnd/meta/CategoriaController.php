@@ -6,15 +6,41 @@ class CategoriaController {
     private $db;
     private $categoria;
     private $upload_dir;
+    private $default_dir;
+    private $default_image_url = '/uploads/default/default-image.jpg.jpeg';
 
     public function __construct() {
         $database = new Database();
         $this->db = $database->getConnection();
         $this->categoria = new Categoria($this->db);
+
+        // Carpeta para imágenes de categorías
         $this->upload_dir = __DIR__ . '/../../uploads/categorias/';
         if (!is_dir($this->upload_dir)) {
             mkdir($this->upload_dir, 0777, true);
         }
+
+        // Carpeta para la imagen por defecto
+        $this->default_dir = __DIR__ . '/../../uploads/default/';
+        if (!is_dir($this->default_dir)) {
+            mkdir($this->default_dir, 0777, true);
+        }
+    }
+
+    /**
+     * Verifica si el archivo de imagen existe en disco.
+     * Si no existe (o viene vacío), retorna la URL por defecto.
+     */
+    private function resolverImagen($imagen) {
+        if (empty($imagen)) {
+            return $this->default_image_url;
+        }
+        // La ruta guardada es relativa a la raíz del proyecto (ej: uploads/categorias/xxx.png)
+        $ruta_disco = __DIR__ . '/../../' . ltrim($imagen, '/');
+        if (file_exists($ruta_disco)) {
+            return $imagen;
+        }
+        return $this->default_image_url;
     }
 
     // Obtener datos de entrada (JSON o multipart)
@@ -54,7 +80,13 @@ class CategoriaController {
         $this->categoria->nombre = $data['nombre'];
         $this->categoria->descripcion = isset($data['descripcion']) ? $data['descripcion'] : null;
         $this->categoria->activo = isset($data['activo']) ? $data['activo'] : 1;
-        $this->categoria->imagen = isset($data['imagen']) ? $data['imagen'] : null;
+
+        // Si no se subió imagen, se usa la URL por defecto
+        if (isset($data['imagen']) && !empty($data['imagen'])) {
+            $this->categoria->imagen = $data['imagen'];
+        } else {
+            $this->categoria->imagen = $this->default_image_url;
+        }
 
         if ($this->categoria->create()) {
             http_response_code(201);
@@ -73,6 +105,7 @@ class CategoriaController {
         if ($num > 0) {
             $categorias_arr = [];
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $row['imagen'] = $this->resolverImagen($row['imagen']);
                 $categorias_arr[] = $row;
             }
             http_response_code(200);
@@ -93,6 +126,7 @@ class CategoriaController {
         }
         $categoria = $this->categoria->readOne($id);
         if ($categoria) {
+            $categoria['imagen'] = $this->resolverImagen($categoria['imagen']);
             http_response_code(200);
             echo json_encode($categoria);
         } else {

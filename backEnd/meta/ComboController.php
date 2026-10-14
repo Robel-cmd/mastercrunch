@@ -6,15 +6,41 @@ class ComboController {
     private $db;
     private $combo;
     private $upload_dir;
+    private $default_dir;
+    private $default_image_url = '/uploads/default/default-image.jpg.jpeg';
 
     public function __construct() {
         $database = new Database();
         $this->db = $database->getConnection();
         $this->combo = new Combo($this->db);
+
+        // Carpeta para imágenes de combos
         $this->upload_dir = __DIR__ . '/../../uploads/combos/';
         if (!is_dir($this->upload_dir)) {
             mkdir($this->upload_dir, 0777, true);
         }
+
+        // Carpeta para la imagen por defecto
+        $this->default_dir = __DIR__ . '/../../uploads/default/';
+        if (!is_dir($this->default_dir)) {
+            mkdir($this->default_dir, 0777, true);
+        }
+    }
+
+    /**
+     * Verifica si el archivo de imagen existe en disco.
+     * Si no existe (o viene vacío), retorna la URL por defecto.
+     */
+    private function resolverImagen($imagen) {
+        if (empty($imagen)) {
+            return $this->default_image_url;
+        }
+        // La ruta guardada es relativa a la raíz del proyecto (ej: uploads/combos/xxx.png)
+        $ruta_disco = __DIR__ . '/../../' . ltrim($imagen, '/');
+        if (file_exists($ruta_disco)) {
+            return $imagen;
+        }
+        return $this->default_image_url;
     }
 
     private function getInputData() {
@@ -132,7 +158,14 @@ class ComboController {
         $this->combo->nombre = $data['nombre'];
         $this->combo->descripcion = $data['descripcion'] ?? null;
         $this->combo->precio_total = $data['precio_total'];
-        $this->combo->url_imagen_combo = $data['url_imagen_combo'] ?? null;
+
+        // Si no se subió imagen, se usa la URL por defecto
+        if (isset($data['url_imagen_combo']) && !empty($data['url_imagen_combo'])) {
+            $this->combo->url_imagen_combo = $data['url_imagen_combo'];
+        } else {
+            $this->combo->url_imagen_combo = $this->default_image_url;
+        }
+
         $this->combo->activo = isset($data['activo']) ? $data['activo'] : 1;
 
         if ($this->combo->create()) {
@@ -172,7 +205,7 @@ class ComboController {
                     "nombre"           => $row['nombre'],
                     "descripcion"      => $row['descripcion'],
                     "precio_total"     => $row['precio_total'],
-                    "url_imagen_combo" => $row['url_imagen_combo'],
+                    "url_imagen_combo" => $this->resolverImagen($row['url_imagen_combo']),
                     "activo"           => $row['activo'],
                     "detalles"         => []
                 ];
@@ -200,6 +233,7 @@ class ComboController {
         }
         $combo = $this->combo->readOne($id);
         if ($combo) {
+            $combo['url_imagen_combo'] = $this->resolverImagen($combo['url_imagen_combo']);
             http_response_code(200);
             echo json_encode($combo);
         } else {
