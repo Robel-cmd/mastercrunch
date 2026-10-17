@@ -1,0 +1,244 @@
+
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+.cocina-board {
+    user-select: none;
+    -webkit-user-select: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    height: calc(100vh - 160px);
+    align-items: start;
+}
+body {
+    touch-action: manipulation;
+}
+/*Columnas*/
+.cocina-column {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.cocina-column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--card-background-color);
+}
+
+.cocina-column-header .icon-image {
+    gap: 8px;
+}
+
+.cocina-column-header .titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.badge-count {
+    background-color: var(--border-color);
+    color: var(--text-color);
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 50px;
+    margin-left: 8px;
+}
+
+/* Botón Preparar todos */
+.btn-preparar-todos {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: 1px solid var(--primary-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-preparar-todos:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+.cocina-column-header .btn-preparar-todos {
+    padding: 12px 20px;
+    font-size: 1rem;
+}
+/*Lista*/
+.cocina-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.cocina-list::-webkit-scrollbar {
+    width: 6px;
+}
+.cocina-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+/*Tarjeta de Pedido*/
+.cocina-card {
+    background-color: var(--card-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    user-select: none;
+    /* Borde izquierdo*/
+    border-left: 4px solid var(--border-color);
+}
+
+/* Efecto hover y active*/
+.cocina-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.cocina-card:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+/* Colores por estado*/
+#list-nuevos .cocina-card { border-left-color: var(--btn-third); } /* Azul */
+#list-preparando .cocina-card { border-left-color: var(--primary-color); } /* Naranja */
+#list-listo .cocina-card { border-left-color: var(--positive-color); opacity: 0.85; } /* Verde */
+
+/* Header de la tarjeta*/
+.cocina-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cocina-card-top h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.badge-pago {
+    background-color: var(--table-cell-secondary);
+    color: var(--text-color);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+/* Tiempo estimado */
+.cocina-card-time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+/* Lista de items*/
+.cocina-card-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cocina-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.cocina-item-qty {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: 0.75rem;
+    font-weight: 800;
+    min-width: 28px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+/* Footer de la tarjeta*/
+.cocina-card-action {
+    margin-top: 8px;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+/* Cambio de color del footer*/
+#list-nuevos .cocina-card-action { color: var(--btn-third-secondary); }
+#list-preparando .cocina-card-action { color: var(--primary-color-btn); }
+#list-listo .cocina-card-action { color: var(--positive-color); }
+/* Efecto hold*/
+.cocina-card.presionando {
+    transform: scale(0.96);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+    border-color: var(--primary-color);
+}
+.cocina-card-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 6px;
+    background-color: var(--primary-color);
+    width: 0%;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    transition: width 0.05s linear;
+    z-index: 1;
+}
+.cocina-card {
+    position: relative; 
+}
+@media (max-width: 1024px) {
+    .cocina-board {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+    .cocina-column {
+        height: 500px;
+    }
+}
