@@ -183,7 +183,7 @@
         <div class="pedidos-lista" id="pedidos-lista">
 
             <!-- Pestaña: EN PROCESO -->
-            <div class="pedidos-tab-content active" data-content="en-proceso">
+            <div class="pedidos-tab-content active" data-content="en-proceso" id="contenido-en-proceso">
 
                 <article class="pedido-flotante-item">
                     <div class="pedido-flotante-top">
@@ -200,7 +200,7 @@
             </div>
 
             <!-- Pestaña: COMPLETADO -->
-            <div class="pedidos-tab-content" data-content="completado">
+            <div class="pedidos-tab-content" data-content="completado" id="contenido-completado">
 
                 <article class="pedido-flotante-item completado">
                     <div class="pedido-flotante-top">
