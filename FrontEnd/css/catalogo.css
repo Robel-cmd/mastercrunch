@@ -634,6 +634,7 @@
 }
 
 .paginacion span {
+    color: var(--text-color);
     display: inline-flex;
     align-items: center;
     justify-content: center;
