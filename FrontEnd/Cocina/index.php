@@ -10,7 +10,7 @@
         <div class="cocina-column-header">
             <div class="icon-image">
                 <i class='bx bx-receipt'></i>
-                <span class="titulo">Nuevas órdenes</span>
+                <span class="titulo">En cola</span>
                 <span class="badge-count" id="count-nuevos">0</span>
             </div>
             <button class="btn-preparar-todos" id="btn-preparar-todos">Preparar todos</button>
@@ -39,7 +39,7 @@
         <div class="cocina-column-header">
             <div class="icon-image">
                 <i class='bx bx-check-circle'></i>
-                <span class="titulo">Listo</span>
+                <span class="titulo">Completado</span>
                 <span class="badge-count" id="count-listo">0</span>
             </div>
         </div>

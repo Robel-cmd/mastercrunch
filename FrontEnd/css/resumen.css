@@ -217,6 +217,13 @@ body.dark-mode canvas {
     }
 }
 
+/* Tableta: las gráficas también van de 2 en 2 para aprovechar el espacio */
+@media (min-width: 900px) {
+    .charts-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (min-width: 1200px) {
     .kpi-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -386,6 +393,86 @@ body.dark-mode canvas {
 
 .warning-modal .content-priority .cancelar-desactivar:hover {
     background: #cbd5e1;
+}
+
+/* ===================== Tablet y teléfono ===================== */
+
+/* Tablet vertical (≤900px): tarjetas KPI más holgadas */
+@media (max-width: 900px) {
+    .container {
+        padding: 16px;
+    }
+}
+
+/* Teléfono (≤480px): KPIs en 2 columnas y modales a ancho de pantalla */
+@media (max-width: 480px) {
+    .title-text {
+        font-size: 1.3rem;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .container {
+        padding: 14px;
+        border-radius: 10px;
+    }
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .card-header {
+        padding: 12px;
+        column-gap: 10px;
+        row-gap: 8px;
+    }
+    .icon-wrapper {
+        padding: 5px;
+    }
+    .icon-box i {
+        font-size: 1.15rem;
+    }
+    .badge.negative {
+        padding: 2px 8px;
+        gap: 6px;
+    }
+    .badge-text {
+        font-size: 10px;
+    }
+    .card-title {
+        font-size: 13px;
+    }
+    .card-value {
+        font-size: 18px;
+    }
+    .header-card-container .titulo {
+        font-size: 1rem;
+    }
+    /* gráficas: altura reducida pero conservando el lienzo */
+    .chart-wrapper {
+        height: 220px;
+    }
+    /* modales de confirmación a ancho de pantalla */
+    .success-modal,
+    .warning-modal {
+        width: calc(100vw - 2rem);
+        max-width: 340px;
+    }
+    .content-priority {
+        padding: 18px 16px;
+    }
+    .description-priority,
+    .warning-modal .description-priority {
+        font-size: 18px;
+    }
+    .conteiner-icon.OK,
+    .conteiner-icon.warning {
+        width: 52px;
+        height: 52px;
+        font-size: 30px;
+    }
+    .warning-modal .content-priority button {
+        flex: 1;
+        padding: 12px 10px;
+    }
 }
 
 

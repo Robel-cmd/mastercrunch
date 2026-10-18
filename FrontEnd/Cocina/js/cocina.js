@@ -1,25 +1,154 @@
 function initCocina() {
-    // Datos de prueba
-    // aqui cargaras los datos API
-    let pedidos = [
-        { id: 1, estado: 'nuevo', pago: 'Efectivo', tiempo: '15min', items: [{ cant: 1, nombre: 'Hamburguesa' }, { cant: 1, nombre: 'Hamburguesa' }] },
-        { id: 2, estado: 'nuevo', pago: 'Tarjeta', tiempo: '10min', items: [{ cant: 2, nombre: 'Alitas BBQ' }] },
-        { id: 3, estado: 'preparando', pago: 'Efectivo', tiempo: '5min', items: [{ cant: 1, nombre: 'Pizza Personal' }] },
-        { id: 4, estado: 'listo', pago: 'Efectivo', tiempo: 'Entregado', items: [{ cant: 1, nombre: 'Pollo Frito' }] }
-    ];
+    // ------------------------------------------------------------------
+    // Tablero de cocina — funciona con DATOS DE PRUEBA (mock local)
+    //
+    // La integración con la API queda pendiente para el encargado del
+    // backend; los puntos de conexión están marcados con "TODO API:".
+    //
+    // Estados de pedidos.estado que gobiernan las columnas:
+    //   pendiente/recibido -> En cola
+    //   preparacion        -> En preparación
+    //   entregado          -> Completado
+    //   cancelado          -> no se muestra en cocina
+    // ------------------------------------------------------------------
 
-    //Elementos del DOM
+    // Elementos del DOM
     const listNuevos = document.getElementById('list-nuevos');
     const listPreparando = document.getElementById('list-preparando');
     const listListo = document.getElementById('list-listo');
-    
+
     const countNuevos = document.getElementById('count-nuevos');
     const countPreparando = document.getElementById('count-preparando');
     const countListo = document.getElementById('count-listo');
 
     const board = document.querySelector('.cocina-board');
+    if (!board || !listNuevos || !listPreparando || !listListo) return;
 
-    //Renderizar Tarjetas
+    const btnPrepararTodos = document.getElementById('btn-preparar-todos');
+
+    // ------------------------------------------------------------------
+    // Utilidades
+    // ------------------------------------------------------------------
+    function minutosAtras(min) {
+        return new Date(Date.now() - min * 60000).toISOString();
+    }
+
+    // Mapea el estado del pedido a la columna del tablero
+    function columnaDeEstado(estado) {
+        const e = String(estado || '').toLowerCase().trim();
+        if (e === 'pendiente' || e === 'recibido') return 'nuevo';
+        if (e === 'preparacion') return 'preparando';
+        if (e === 'entregado') return 'listo';
+        return null; // cancelado u otros: no se muestra en cocina
+    }
+
+    function etiquetaEstado(estado) {
+        if (estado === 'preparacion') return 'En preparación';
+        if (estado === 'entregado') return 'Completado';
+        return 'En cola';
+    }
+
+    function tiempoTranscurrido(fecha) {
+        if (!fecha) return '';
+        const inicio = new Date(String(fecha).replace(' ', 'T')).getTime();
+        if (isNaN(inicio)) return '';
+        const min = Math.floor((Date.now() - inicio) / 60000);
+        if (min < 1) return 'Hace instantes';
+        if (min < 60) return `Hace ${min} min`;
+        const h = Math.floor(min / 60);
+        return `Hace ${h} h ${min % 60} min`;
+    }
+
+    // ------------------------------------------------------------------
+    // Datos de prueba del tablero
+    // TODO API: sustituir por fetch a api/pedido.php?entity=pedido y
+    //           ?entity=DetallePedido (los nombres de producto/combo se
+    //           resuelven con meta.php?entity=producto / entity=combo).
+    //           El backend responde 404 sin registros: tratarlo como [].
+    // ------------------------------------------------------------------
+    const PEDIDOS_PRUEBA = [
+        {
+            id_pedido: 101, id_empleado: 1, estado: 'pendiente', tipo_pedido: 'LOCAL',
+            cliente: 'María López',
+            observaciones: 'Sin cebolla en la hamburguesa',
+            fecha_hora_pedido: minutosAtras(3), fecha_hora_entrega: null,
+            items: [
+                { cant: 2, nombre: 'Hamburguesa clásica', comentario: '' },
+                { cant: 1, nombre: 'Papas grandes', comentario: '' }
+            ]
+        },
+        {
+            id_pedido: 102, id_empleado: 1, estado: 'pendiente', tipo_pedido: 'PARA_LLEVAR',
+            cliente: '',
+            observaciones: '',
+            fecha_hora_pedido: minutosAtras(8), fecha_hora_entrega: null,
+            items: [
+                { cant: 1, nombre: 'Combo Crunch', comentario: 'extra queso' },
+                { cant: 2, nombre: 'Refresco 500ml', comentario: '' }
+            ]
+        },
+        {
+            id_pedido: 103, id_empleado: 1, estado: 'pendiente', tipo_pedido: 'DELIVERY',
+            cliente: 'Jorge Ruiz',
+            observaciones: 'Llamar antes de llegar',
+            fecha_hora_pedido: minutosAtras(1), fecha_hora_entrega: null,
+            items: [
+                { cant: 1, nombre: 'Ensalada César', comentario: 'aderezo aparte' }
+            ]
+        },
+        {
+            id_pedido: 104, id_empleado: 1, estado: 'preparacion', tipo_pedido: 'LOCAL',
+            cliente: 'Ana Mejía',
+            observaciones: '',
+            fecha_hora_pedido: minutosAtras(14), fecha_hora_entrega: null,
+            items: [
+                { cant: 3, nombre: 'Tacos de res', comentario: '' },
+                { cant: 1, nombre: 'Agua natural', comentario: '' }
+            ]
+        },
+        {
+            id_pedido: 105, id_empleado: 1, estado: 'preparacion', tipo_pedido: 'PARA_LLEVAR',
+            cliente: '',
+            observaciones: 'Entregar en caja 2',
+            fecha_hora_pedido: minutosAtras(21), fecha_hora_entrega: null,
+            items: [
+                { cant: 1, nombre: 'Combo familiar', comentario: '' },
+                { cant: 2, nombre: 'Papas grandes', comentario: 'bien doradas' }
+            ]
+        },
+        {
+            id_pedido: 106, id_empleado: 1, estado: 'entregado', tipo_pedido: 'LOCAL',
+            cliente: 'Carla Flores',
+            observaciones: '',
+            fecha_hora_pedido: minutosAtras(40), fecha_hora_entrega: minutosAtras(12),
+            items: [
+                { cant: 2, nombre: 'Pizza mediana', comentario: '' }
+            ]
+        },
+        {
+            id_pedido: 107, id_empleado: 1, estado: 'entregado', tipo_pedido: 'DELIVERY',
+            cliente: 'Pedro Santos',
+            observaciones: '',
+            fecha_hora_pedido: minutosAtras(55), fecha_hora_entrega: minutosAtras(25),
+            items: [
+                { cant: 1, nombre: 'Hamburguesa doble', comentario: '' },
+                { cant: 1, nombre: 'Refresco 500ml', comentario: '' }
+            ]
+        }
+    ];
+
+    // Copia local de trabajo: los cambios de estado solo viven en esta sesión
+    let pedidos = PEDIDOS_PRUEBA.map(p => ({ ...p, items: p.items.map(i => ({ ...i })) }));
+
+    function cargarDatos() {
+        // TODO API: traer los pedidos reales, normalizarlos con sus ítems
+        //           (igual que el mock: { ...pedido, items: [...] }) y luego:
+        renderizar();
+    }
+
+    // ------------------------------------------------------------------
+    // Renderizado de tarjetas
+    // ------------------------------------------------------------------
     function renderizar() {
         listNuevos.innerHTML = '';
         listPreparando.innerHTML = '';
@@ -28,21 +157,24 @@ function initCocina() {
         let totalNuevos = 0, totalPrep = 0, totalListos = 0;
 
         pedidos.forEach(pedido => {
+            const columna = columnaDeEstado(pedido.estado);
+
             const itemsHtml = pedido.items.map(item => `
                 <div class="cocina-item">
                     <span class="cocina-item-qty">x${item.cant}</span>
                     <span>${item.nombre}</span>
                 </div>
-            `).join('');
+                ${item.comentario ? `<p class="cocina-item-comentario">📝 ${item.comentario}</p>` : ''}
+            `).join('') || '<div class="cocina-item"><span>Sin productos registrados</span></div>';
 
             let accionTexto = '';
             let accionIcono = '';
-            if (pedido.estado === 'nuevo') {
-                accionTexto = 'Toca para preparar';
+            if (columna === 'nuevo') {
+                accionTexto = 'Mantén pulsado para preparar';
                 accionIcono = "<i class='bx bx-chevron-down'></i>";
                 totalNuevos++;
-            } else if (pedido.estado === 'preparando') {
-                accionTexto = 'Toca para completar';
+            } else if (columna === 'preparando') {
+                accionTexto = 'Mantén pulsado para completar';
                 accionIcono = "<i class='bx bx-check'></i>";
                 totalPrep++;
             } else {
@@ -51,28 +183,38 @@ function initCocina() {
                 totalListos++;
             }
 
+            const tipoPedido = String(pedido.tipo_pedido || '')
+                .replace(/_/g, ' ').toUpperCase() || 'PEDIDO';
+            const cliente = pedido.cliente || 'Cliente no especificado';
+            const cuando = columna === 'listo'
+                ? (pedido.fecha_hora_entrega
+                    ? 'Entregado ' + tiempoTranscurrido(pedido.fecha_hora_entrega).replace('Hace', 'hace')
+                    : 'Completado')
+                : tiempoTranscurrido(pedido.fecha_hora_pedido);
+
             const card = document.createElement('article');
             card.className = 'cocina-card';
-            card.dataset.id = pedido.id;
+            card.dataset.id = pedido.id_pedido;
             card.innerHTML = `
                 <div class="cocina-card-top">
-                    <h3>Pedido #${pedido.id}</h3>
-                    <span class="badge-pago">${pedido.pago}</span>
+                    <h3>Pedido #${pedido.id_pedido}</h3>
+                    <span class="badge-pago">${tipoPedido}</span>
                 </div>
                 <div class="cocina-card-time">
-                    <span>Tiempo estimado</span>
-                    <span>${pedido.tiempo}</span>
+                    <span>${cuando}</span>
+                    <span>${cliente}</span>
                 </div>
                 <div class="cocina-card-items">
                     ${itemsHtml}
                 </div>
+                ${pedido.observaciones ? `<p class="cocina-card-nota">📌 ${pedido.observaciones}</p>` : ''}
                 <div class="cocina-card-action">
                     ${accionIcono} ${accionTexto}
                 </div>
             `;
 
-            if (pedido.estado === 'nuevo') listNuevos.appendChild(card);
-            else if (pedido.estado === 'preparando') listPreparando.appendChild(card);
+            if (columna === 'nuevo') listNuevos.appendChild(card);
+            else if (columna === 'preparando') listPreparando.appendChild(card);
             else listListo.appendChild(card);
         });
 
@@ -81,8 +223,46 @@ function initCocina() {
         countListo.textContent = totalListos;
     }
 
-    //Lógica de Long Press
-    let progressInterval;
+    // ------------------------------------------------------------------
+    // Cambio de estado (local por ahora; sin HTTP)
+    // TODO API: enviar PUT a api/pedido.php?entity=pedido con
+    //           { id_pedido, id_empleado, estado, tipo_pedido }
+    //           (+ cliente y observaciones opcionales) — el backend
+    //           exige esos cuatro campos en todo update.
+    // ------------------------------------------------------------------
+    function cambiarEstadoPedido(pedido, nuevoEstado) {
+        pedido.estado = nuevoEstado;
+        if (nuevoEstado === 'entregado') {
+            pedido.fecha_hora_entrega = new Date().toISOString();
+        }
+        if (typeof mostrarNotificacion === 'function') {
+            mostrarNotificacion(`Pedido #${pedido.id_pedido} → ${etiquetaEstado(nuevoEstado)}`, 'success');
+        }
+    }
+
+    function confirmarPedido(idPedido, card) {
+        const pedido = pedidos.find(p => String(p.id_pedido) === String(idPedido));
+        if (!pedido) return;
+
+        const columna = columnaDeEstado(pedido.estado);
+        let nuevoEstado = null;
+        if (columna === 'nuevo') nuevoEstado = 'preparacion';
+        else if (columna === 'preparando') nuevoEstado = 'entregado';
+        if (!nuevoEstado) return;
+
+        cambiarEstadoPedido(pedido, nuevoEstado);
+
+        if (card) {
+            card.style.transform = 'scale(0.95)';
+            card.style.opacity = '0';
+        }
+        setTimeout(renderizar, 250);
+    }
+
+    // ------------------------------------------------------------------
+    // Lógica de Mantener Pulsado (long press)
+    // ------------------------------------------------------------------
+    let progressInterval = null;
     let currentCard = null;
     let currentIdPedido = null;
     let startX = 0;
@@ -107,93 +287,77 @@ function initCocina() {
         progressBar.className = 'cocina-card-progress';
         card.appendChild(progressBar);
 
-        let tiempoTranscurrido = 0;
+        let tiempoTranscurridoMs = 0;
         card.classList.add('presionando');
-        
+
         progressBar.style.width = '0%';
-        void progressBar.offsetWidth; 
+        void progressBar.offsetWidth;
 
         progressInterval = setInterval(() => {
-            tiempoTranscurrido += 50;
-            const porcentaje = (tiempoTranscurrido / TIEMPO_CONFIRMACION) * 100;
+            tiempoTranscurridoMs += 50;
+            const porcentaje = (tiempoTranscurridoMs / TIEMPO_CONFIRMACION) * 100;
             progressBar.style.width = `${porcentaje}%`;
 
-            if (tiempoTranscurrido >= TIEMPO_CONFIRMACION) {
+            if (tiempoTranscurridoMs >= TIEMPO_CONFIRMACION) {
+                const id = currentIdPedido;
+                const target = currentCard;
                 cancelarPresion();
-                confirmarPedido(idPedido, card);
+                confirmarPedido(id, target);
             }
         }, 50);
     }
 
     function cancelarPresion() {
         clearInterval(progressInterval);
-        
+        progressInterval = null;
+
         if (currentCard) {
             currentCard.classList.remove('presionando');
             const progressBar = currentCard.querySelector('.cocina-card-progress');
-            if (progressBar) progressBar.remove(); // Eliminar del DOM
+            if (progressBar) progressBar.remove();
         }
-        
+
         currentCard = null;
         currentIdPedido = null;
-    }
-
-    function confirmarPedido(idPedido, card) {
-        const pedido = pedidos.find(p => p.id === idPedido);
-        if (!pedido) return;
-
-        if (pedido.estado === 'nuevo') {
-            pedido.estado = 'preparando';
-        } else if (pedido.estado === 'preparando') {
-            pedido.estado = 'listo';
-        }
-
-        card.style.transform = 'scale(0.95)';
-        card.style.opacity = '0';
-        
-        setTimeout(() => {
-            renderizar();
-        }, 200);
     }
 
     // --- Eventos Pointer
     board.addEventListener('pointerdown', (e) => {
         const card = e.target.closest('.cocina-card');
-        // Ignorar si no hay tarjeta
-        if (!card || card.closest('#col-listo')) return; 
+        // Ignorar si no hay tarjeta (la columna Completado avanza con click + modal)
+        if (!card || card.closest('#col-listo')) return;
 
-        // Iniciar presión pasando el evento
         iniciarPresion(e, card, parseInt(card.dataset.id));
     });
 
-    // Escuchar para soltar o cancelar
-    window.addEventListener('pointerup', () => {
-        if (currentCard) cancelarPresion();
-    });
+    // Handlers globales: se limpian y re-registran en cada navegación
+    // al módulo para no duplicar listeners
+    if (window._cocinaPointerUp) window.removeEventListener('pointerup', window._cocinaPointerUp);
+    window._cocinaPointerUp = () => { if (currentCard) cancelarPresion(); };
+    window.addEventListener('pointerup', window._cocinaPointerUp);
 
-    window.addEventListener('pointercancel', () => {
-        if (currentCard) cancelarPresion();
-    });
+    if (window._cocinaPointerCancel) window.removeEventListener('pointercancel', window._cocinaPointerCancel);
+    window._cocinaPointerCancel = () => { if (currentCard) cancelarPresion(); };
+    window.addEventListener('pointercancel', window._cocinaPointerCancel);
 
-    // Si el dedo se mueve mucho, cancelar
-    window.addEventListener('pointermove', (e) => {
+    if (window._cocinaPointerMove) window.removeEventListener('pointermove', window._cocinaPointerMove);
+    window._cocinaPointerMove = (e) => {
         if (!currentCard) return;
-        
         const dx = Math.abs(e.clientX - startX);
         const dy = Math.abs(e.clientY - startY);
-        
-        if (dx > MAX_MOVIMIENTO || dy > MAX_MOVIMIENTO) {
-            cancelarPresion();
-        }
-    });
+        if (dx > MAX_MOVIMIENTO || dy > MAX_MOVIMIENTO) cancelarPresion();
+    };
+    window.addEventListener('pointermove', window._cocinaPointerMove);
 
-    // Modal de Reversión
+    // ------------------------------------------------------------------
+    // Modal de reversión (Completado -> En preparación)
+    // ------------------------------------------------------------------
     const modalRevertir = document.getElementById('modal-revertir');
     const btnConfirmarRevertir = document.getElementById('confirmar-revertir');
     const btnCancelarRevertir = document.getElementById('cancelar-revertir');
     let idPedidoARevertir = null;
 
-    // Clic normal modal
+    // Clic normal en columna Completado
     board.addEventListener('click', (e) => {
         const card = e.target.closest('.cocina-card');
         if (!card) return;
@@ -206,23 +370,40 @@ function initCocina() {
 
     if (btnCancelarRevertir) {
         btnCancelarRevertir.addEventListener('click', () => {
-            modalRevertir.close();
+            if (modalRevertir) modalRevertir.close();
             idPedidoARevertir = null;
         });
     }
 
     if (btnConfirmarRevertir) {
         btnConfirmarRevertir.addEventListener('click', () => {
-            if (idPedidoARevertir) {
-                const pedido = pedidos.find(p => p.id === idPedidoARevertir);
-                if (pedido) {
-                    pedido.estado = 'preparando';
-                    renderizar();
-                }
+            const pedido = pedidos.find(p => String(p.id_pedido) === String(idPedidoARevertir));
+            if (pedido) {
+                cambiarEstadoPedido(pedido, 'preparacion');
+                renderizar();
             }
-            modalRevertir.close();
+            if (modalRevertir) modalRevertir.close();
             idPedidoARevertir = null;
         });
     }
-    renderizar();
+
+    // ------------------------------------------------------------------
+    // Botón "Preparar todos"
+    // ------------------------------------------------------------------
+    if (btnPrepararTodos) {
+        btnPrepararTodos.addEventListener('click', () => {
+            const enCola = pedidos.filter(p => columnaDeEstado(p.estado) === 'nuevo');
+            if (!enCola.length) {
+                if (typeof mostrarNotificacion === 'function') {
+                    mostrarNotificacion('No hay pedidos en cola', 'error');
+                }
+                return;
+            }
+            enCola.forEach(p => cambiarEstadoPedido(p, 'preparacion'));
+            renderizar();
+        });
+    }
+
+    // Primera carga (mock local; el polling se omite hasta conectar la API)
+    cargarDatos();
 }

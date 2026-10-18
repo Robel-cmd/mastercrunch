@@ -38,8 +38,30 @@ function renderPaginacion(container, paginaActual, totalItems, porPagina, onChan
 
     html += `<button data-page="${paginaActual - 1}" ${paginaActual <= 1 ? 'disabled' : ''}>&lt;</button>`;
 
-    for (let i = 1; i <= totalPaginas; i++) {
-        html += `<span data-page="${i}" class="${i === paginaActual ? 'active' : ''}" style="cursor:pointer;">${i}</span>`;
+    // Ventana compacta: primera, última y las vecinas a la actual.
+    // Los saltos se muestran como "…" (evita desbordes en pantallas pequeñas).
+    const paginas = new Set([1, totalPaginas, paginaActual, paginaActual - 1, paginaActual + 1]);
+    if (paginaActual <= 3) {
+        paginas.add(2); paginas.add(3); paginas.add(4);
+    }
+    if (paginaActual >= totalPaginas - 2) {
+        paginas.add(totalPaginas - 1); paginas.add(totalPaginas - 2); paginas.add(totalPaginas - 3);
+    }
+    const lista = [...paginas]
+        .filter(p => p >= 1 && p <= totalPaginas)
+        .sort((a, b) => a - b);
+
+    let anterior = 0;
+    for (const p of lista) {
+        if (p - anterior === 2) {
+            // Solo falta una página entre ambos: mejor mostrarla que un "…"
+            const falta = anterior + 1;
+            html += `<span data-page="${falta}" style="cursor:pointer;">${falta}</span>`;
+        } else if (p - anterior > 2) {
+            html += `<span class="paginacion-ellipsis" aria-hidden="true">…</span>`;
+        }
+        html += `<span data-page="${p}" class="${p === paginaActual ? 'active' : ''}" style="cursor:pointer;">${p}</span>`;
+        anterior = p;
     }
 
     html += `<button data-page="${paginaActual + 1}" ${paginaActual >= totalPaginas ? 'disabled' : ''}>&gt;</button>`;

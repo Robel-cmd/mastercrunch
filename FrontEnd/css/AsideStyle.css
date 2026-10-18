@@ -476,6 +476,28 @@ body.dark-mode .dark-mode-btn i:first-child{
     padding-left: 7.96rem;
 }
 /*MEDIA RSP*/
+
+/* Táctil global: quita el resaltado de toque y el retardo de zoom por doble
+   toque (conserva desplazamiento y pinch-zoom) */
+@media (pointer: coarse){
+    *{
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+}
+
+/* Tableta horizontal (901px – 1024px): espacios más compactos,
+   la barra lateral sigue visible */
+@media (max-width: 1024px){
+    main{
+        padding: 1.5rem 1.5rem 2.5rem 16.5rem;
+    }
+    .sidebar.minimize + main{
+        padding-left: 7.5rem;
+    }
+}
+
+/* Pantallas bajas: compacta el sidebar y el contenido */
 @media (max-height: 683px){
     .footer{
         box-shadow: none;
@@ -498,7 +520,9 @@ body.dark-mode .dark-mode-btn i:first-child{
     }
 }
 
-@media (max-width: 700px) or (max-height: 683px){
+/* Tableta vertical y teléfonos (≤900px): la barra lateral pasa a overlay
+   y el contenido gana el ancho completo */
+@media (max-width: 900px) or (max-height: 683px){
     main,
     .sidebar.minimize + main {
         padding: 2rem !important;
@@ -532,5 +556,32 @@ body.dark-mode .dark-mode-btn i:first-child{
     }
     main{
         padding: 2rem;
+    }
+}
+
+/* Teléfono (≤480px): espacios compactos y objetivos táctiles */
+@media (max-width: 480px){
+    main{
+        padding: 1rem !important;
+    }
+    .title-text{
+        font-size: 1.3rem;
+    }
+    .header-body h4{
+        font-size: 0.8rem;
+    }
+    .header-body{
+        margin-bottom: 1rem;
+        padding-right: 3.2rem; /* deja libre el botón flotante del menú */
+    }
+    .sidebar-btn{
+        width: 2.8rem;
+        height: 2.8rem;
+        top: 1rem;
+    }
+    .dark-mode-btn{
+        width: 2.8rem;
+        height: 2.8rem;
+        bottom: 1.5rem;
     }
 }

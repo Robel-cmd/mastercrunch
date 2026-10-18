@@ -106,6 +106,8 @@ body {
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     /* Borde izquierdo*/
     border-left: 4px solid var(--border-color);
 }
@@ -190,6 +192,25 @@ body {
     border-radius: 4px;
 }
 
+/* Comentario de una línea del pedido */
+.cocina-item-comentario {
+    margin: -2px 0 0 38px;
+    font-size: 0.75rem;
+    font-style: italic;
+    color: var(--color-text-secondary);
+}
+
+/* Observaciones generales del pedido */
+.cocina-card-nota {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    background-color: var(--background-color);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 4px;
+    padding: 6px 8px;
+}
+
 /* Footer de la tarjeta*/
 .cocina-card-action {
     margin-top: 8px;
@@ -233,12 +254,119 @@ body {
 .cocina-card {
     position: relative; 
 }
+
+/* ==================================================================
+   Adaptación a tabletas y teléfonos
+   ================================================================== */
+
+/* Tableta horizontal (901px – 1024px): se conservan las 3 columnas
+   del tablero, con espacios y textos más compactos */
 @media (max-width: 1024px) {
+    .cocina-board {
+        gap: 12px;
+        height: calc(100vh - 140px);
+    }
+    .cocina-column-header {
+        padding: 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .cocina-column-header .btn-preparar-todos {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    .cocina-list {
+        padding: 12px;
+        gap: 10px;
+    }
+    .cocina-card {
+        padding: 12px;
+        gap: 8px;
+    }
+    .cocina-card-top h3 {
+        font-size: 1rem;
+    }
+    .cocina-card-time {
+        font-size: 0.7rem;
+    }
+    .cocina-item {
+        font-size: 0.85rem;
+    }
+    .cocina-item-qty {
+        min-width: 26px;
+        height: 22px;
+    }
+    .cocina-card-action {
+        padding: 10px 6px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Tableta vertical y teléfono en horizontal (≤900px):
+   las 3 secciones se apilan en una sola columna con scroll propio */
+@media (max-width: 900px) {
     .cocina-board {
         grid-template-columns: 1fr;
         height: auto;
+        gap: 14px;
     }
     .cocina-column {
-        height: 500px;
+        height: auto;
+    }
+    .cocina-list {
+        max-height: 45vh;
+    }
+}
+
+/* Teléfono (≤480px): versión compacta y con objetivos táctiles */
+@media (max-width: 480px) {
+    .cocina-board {
+        gap: 10px;
+    }
+    .cocina-column {
+        border-radius: 10px;
+    }
+    .cocina-column-header {
+        padding: 10px 12px;
+    }
+    .cocina-column-header .titulo {
+        font-size: 0.9rem;
+    }
+    .cocina-column-header .btn-preparar-todos {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.85rem;
+        text-align: center;
+    }
+    .cocina-list {
+        padding: 10px;
+        max-height: 40vh;
+        gap: 8px;
+    }
+    .cocina-card {
+        padding: 10px;
+        gap: 8px;
+    }
+    .cocina-card-top h3 {
+        font-size: 0.95rem;
+    }
+    .badge-pago {
+        font-size: 0.6rem;
+        padding: 3px 8px;
+    }
+    .cocina-card-time {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .cocina-item {
+        font-size: 0.85rem;
+    }
+    .cocina-item-comentario {
+        margin-left: 34px;
+    }
+    .cocina-card-action {
+        padding: 12px 8px;
+        min-height: 44px;
+        font-size: 0.8rem;
     }
 }
