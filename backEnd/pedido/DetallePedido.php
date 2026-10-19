@@ -42,6 +42,44 @@ class DetallePedido {
         return $stmt->fetchColumn() !== false;
     }
 
+    /**
+     * Valida la cantidad: debe ser un entero >= 1.
+     * Acepta 5, "5", 5.0 y "05"; rechaza 0, -3, 2.5 y "abc".
+     */
+    public static function isValidCantidadValue($value) {
+        return is_numeric($value)
+            && (float)$value >= 1
+            && floor((float)$value) === (float)$value;
+    }
+
+    /**
+     * Obtiene el precio vigente desde la base de datos (fuente de verdad).
+     * El precio NUNCA se toma del cliente: se lee de productos.precio o
+     * combo.precio_total según corresponda.
+     * Devuelve el precio o false si el producto/combo no existe.
+     */
+    public function resolverPrecioUnitario($idProducto = null, $idCombo = null) {
+        if (!empty($idProducto) && $this->isValidId($idProducto)) {
+            $query = "SELECT precio FROM productos WHERE id_producto = :id LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindValue(':id', (int)$idProducto, PDO::PARAM_INT);
+            $stmt->execute();
+            $precio = $stmt->fetchColumn();
+            return $precio === false ? false : (float)$precio;
+        }
+
+        if (!empty($idCombo) && $this->isValidId($idCombo)) {
+            $query = "SELECT precio_total FROM combo WHERE id_combo = :id LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindValue(':id', (int)$idCombo, PDO::PARAM_INT);
+            $stmt->execute();
+            $precio = $stmt->fetchColumn();
+            return $precio === false ? false : (float)$precio;
+        }
+
+        return false;
+    }
+
     public function create(){
         if (!$this->isValidId($this->id_pedido) || !$this->existsPedido($this->id_pedido)) {
             return false;
@@ -62,13 +100,17 @@ class DetallePedido {
             return false;
         }
 
-        if (!is_int((int) $this->cantidad) || (int)$this->cantidad <= 0) {
+        if (!self::isValidCantidadValue($this->cantidad)) {
             return false;
         }
 
-        if (!is_numeric($this->precio_unitario) || (float)$this->precio_unitario < 0) {
+        // El precio SIEMPRE lo determina el servidor; el valor enviado por el
+        // cliente se ignora por completo (evita manipular montos).
+        $precio = $this->resolverPrecioUnitario($this->id_producto, $this->id_combo);
+        if ($precio === false) {
             return false;
         }
+        $this->precio_unitario = $precio;
 
         $query = "INSERT INTO " . $this->table_name . "
                       (id_pedido, id_producto, id_combo, cantidad, precio_unitario)
@@ -141,13 +183,16 @@ class DetallePedido {
             return false;
         }
 
-        if (!is_int((int) $this->cantidad) || (int)$this->cantidad <= 0) {
+        if (!self::isValidCantidadValue($this->cantidad)) {
             return false;
         }
 
-        if (!is_numeric($this->precio_unitario) || (float)$this->precio_unitario < 0) {
+        // Igual que en create(): el precio lo fija el servidor.
+        $precio = $this->resolverPrecioUnitario($this->id_producto, $this->id_combo);
+        if ($precio === false) {
             return false;
         }
+        $this->precio_unitario = $precio;
 
         $query = "UPDATE " . $this->table_name . "
                   SET id_pedido = :id_pedido,
