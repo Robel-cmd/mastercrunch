@@ -15,6 +15,7 @@ $base_url = ($pos !== false) ? substr($script_path, 0, $pos) . '/FrontEnd' : '';
     <link rel="stylesheet" href="<?php echo $base_url; ?>/css/AsideStyle.css">
     <link rel="stylesheet" href="<?php echo $base_url; ?>/css/resumen.css">
     <link rel="stylesheet" href="<?php echo $base_url; ?>/css/productos.css">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>/css/cocina.css">
     <!--Librerias-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=lightbulb_2" />
@@ -72,6 +73,12 @@ $base_url = ($pos !== false) ? substr($script_path, 0, $pos) . '/FrontEnd' : '';
                     <a href="<?php echo $base_url; ?>/Catalogo/index.php" class="menu-link">
                         <i class='bx bx-book-content'></i>
                         <span>Pedido</span>
+                    </a>
+                </li>
+                <li class="menu-item menu-item-static">
+                    <a href="<?php echo $base_url; ?>/Cocina/index.php" class="menu-link">
+                        <i class='bx bx-restaurant'></i>
+                        <span>Cocina</span>
                     </a>
                 </li>
                 <li class="menu-item menu-item-static">
@@ -165,6 +172,8 @@ $base_url = ($pos !== false) ? substr($script_path, 0, $pos) . '/FrontEnd' : '';
     <script src="<?php echo $base_url; ?>/Catalogo/js/catalogoProdAPI.js"></script>
     <script src="<?php echo $base_url; ?>/Catalogo/js/tooglePanel.js"></script>
     <script src="<?php echo $base_url; ?>/Catalogo/js/catalogoCarrito.js"></script>
+        <!-- Cocina -->
+    <script src="<?php echo $base_url; ?>/Cocina/js/cocina.js"></script>
 
 </body>
 </html>

@@ -341,7 +341,8 @@ display: flex;
     flex-direction: row;
     gap: 20px;
     margin-top: 20px;
-    overflow-x: hidden;
+    /* En tabletas/teléfonos las tarjetas fijas se desplazan en vez de quedar cortadas */
+    overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 15px;
     width: 100%;
@@ -831,5 +832,74 @@ center .total-combo{
     }
     .modal{
     width: 90%;
+    }
+}
+
+/* ===================== Tablet y teléfono ===================== */
+
+/* Tablet vertical (≤900px): cabeceras con buscador y botón más holgados */
+@media (max-width: 900px) {
+    .header-card-container {
+        gap: 10px;
+    }
+    .header-left {
+        gap: 12px;
+    }
+    .card-actions {
+        padding: 10px 12px;
+    }
+}
+
+/* Teléfono (≤480px): compacto y con objetivos táctiles */
+@media (max-width: 480px) {
+    .container-secondary {
+        padding: 14px;
+        margin-bottom: 20px;
+    }
+    .header-left {
+        gap: 8px;
+    }
+    .icon-image .titulo {
+        font-size: 0.9rem;
+    }
+    /* la tabla principal se desplaza en vez de aplastar sus columnas */
+    #table-content {
+        min-width: 560px;
+    }
+    .table-actions .btn {
+        min-width: 70px;
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+    .imagePreview {
+        height: 260px;
+    }
+    .modal {
+        max-height: calc(100vh - 2rem);
+        margin: auto auto;
+    }
+    .modal-header {
+        padding: 1.1rem 1.1rem 0 1.1rem;
+    }
+    .modal-title {
+        font-size: 1.05rem;
+        padding: 0 2.2rem;
+    }
+    .modal-content {
+        padding: 1.1rem;
+    }
+    .emergente-btn,
+    .confirm-btn {
+        padding: 14px 8px;
+    }
+    /* evita el zoom automático de iOS al enfocar campos */
+    input[type="text"],
+    input[type="number"],
+    select {
+        font-size: 16px;
+    }
+    input[type="file"]::file-selector-button {
+        padding: 12px 16px;
     }
 }

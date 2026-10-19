@@ -25,7 +25,9 @@ function renderCarrito() {
                     <span class="precio">${parseFloat(item.precio).toFixed(2)} Lps</span>
                     <div class="controles-cantidad">
                         <button data-cant-item="${idx}" data-delta="-1">-</button>
-                        <span>${item.cantidad}</span>
+                        <input type="number" inputmode="numeric" min="1" max="99"
+                               class="input-cantidad" data-cant-input="${idx}"
+                               value="${item.cantidad}" title="Cantidad (editable)">
                         <button data-cant-item="${idx}" data-delta="1">+</button>
                     </div>
                 </div>
@@ -120,6 +122,19 @@ function initCarrito() {
             const idx = parseInt(nota.dataset.notaItem, 10);
             if (_carrito[idx]) _carrito[idx].nota = nota.value;
         }
+    });
+
+    // Cantidad escrita a mano: se aplica al confirmar (Enter o salir del campo)
+    lista.addEventListener('change', (e) => {
+        const input = e.target.closest('[data-cant-input]');
+        if (!input) return;
+        const idx = parseInt(input.dataset.cantInput, 10);
+        const item = _carrito[idx];
+        if (!item) return;
+        let v = parseInt(input.value, 10);
+        if (isNaN(v)) v = item.cantidad;
+        item.cantidad = Math.max(1, Math.min(99, v));
+        renderCarrito();
     });
 
     // Botón "Borrar lista" → confirmación; borrar sólo al confirmar
