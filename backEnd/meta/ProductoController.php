@@ -8,7 +8,7 @@ class ProductoController {
     private $producto;
     private $upload_dir;
     private $default_dir;
-    private $default_image_url = '/uploads/default/default-image.jpg.jpeg';
+    private $default_image_url = '/uploads/default/default-image.jpg';
 
     public function __construct() {
         $database = new Database();
