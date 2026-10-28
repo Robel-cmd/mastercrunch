@@ -333,6 +333,70 @@ CREATE TABLE `roles` (
   `nivel_acceso` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- TABLA DE PERMISOS
+CREATE TABLE `permisos` (
+  `id_permiso`  int(11) NOT NULL,
+  `clave`       varchar(100) NOT NULL,
+  `descripcion` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Índices para `permisos`
+ALTER TABLE `permisos`
+  ADD PRIMARY KEY (`id_permiso`),
+  ADD UNIQUE KEY `clave` (`clave`);
+
+-- AUTO_INCREMENT para `permisos`
+
+ALTER TABLE `permisos`
+  MODIFY `id_permiso` int(11) NOT NULL AUTO_INCREMENT;
+
+-- TABLA ROL_PERMISO
+CREATE TABLE `rol_permiso` (
+  `id_rol`     int(11) NOT NULL,
+  `id_permiso` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Índices para `rol_permiso`
+ALTER TABLE `rol_permiso`
+  ADD PRIMARY KEY (`id_rol`, `id_permiso`),
+  ADD KEY `fk_rolpermiso_permiso` (`id_permiso`);
+
+--
+-- Restricciones para `rol_permiso`
+--
+ALTER TABLE `rol_permiso`
+  ADD CONSTRAINT `fk_rolpermiso_rol`
+    FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_rolpermiso_permiso`
+    FOREIGN KEY (`id_permiso`) REFERENCES `permisos` (`id_permiso`)
+    ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- TABLA BITACORA
+CREATE TABLE `bitacora` (
+  `id_log`      int(20) NOT NULL,
+  `id_empleado` int(11) NOT NULL,
+  `accion`      varchar(100) NOT NULL,
+  `tabla`       varchar(100) DEFAULT NULL,
+  `id_registro` varchar(50)  DEFAULT NULL,
+  `detalle`     text DEFAULT NULL,
+  `fecha_hora`  datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Índice para `bitacora`
+ALTER TABLE `bitacora`
+  ADD PRIMARY KEY (`id_log`),
+  ADD KEY `fk_bitacora_empleado` (`id_empleado`);
+
+ALTER TABLE `bitacora`
+  MODIFY `id_log` bigint(20) NOT NULL AUTO_INCREMENT;
+
+-- Restriccion
+ALTER TABLE `bitacora`
+  ADD CONSTRAINT `fk_bitacora_empleado`
+    FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`)
+    ON DELETE RESTRICT ON UPDATE CASCADE;
+
 --
 -- Volcado de datos para la tabla `roles`
 --
@@ -587,6 +651,18 @@ ALTER TABLE `pedidos_detalle`
 ALTER TABLE `productos`
   ADD CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`) ON UPDATE CASCADE;
 COMMIT;
+
+-- Modificacion de tabla facturas
+ALTER TABLE `facturas`
+  ADD COLUMN `subtotal` decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `id_metodo_pago`,
+  ADD COLUMN `isv`      decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `subtotal`,
+  ADD COLUMN `total`    decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `isv`;
+
+-- Modificacion de tabla factura_detalle
+ALTER TABLE `factura_detalle`
+  ADD COLUMN `subtotal_linea` decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `descuento`,-- hay que recoordar que estos campos son de tipo numerico
+  ADD COLUMN `isv_linea`      decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `subtotal_linea`, -- a lo cual se pondran en 0 para iniciar cada campo y que no
+  ADD COLUMN `total_linea`    decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `isv_linea`;	-- aparezca con datos errones o inexistente
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
