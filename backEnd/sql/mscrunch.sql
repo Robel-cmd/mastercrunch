@@ -8,97 +8,39 @@
 -- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
 SET time_zone = "+00:00";
+SET NAMES utf8mb4;
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de datos: `master_crunch_db`
 CREATE DATABASE IF NOT EXISTS master_crunch_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE master_crunch_db;
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `categoria`
---
-
-CREATE TABLE `categoria` (
-  `id_categoria` int(11) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
-  `activo` tinyint(1) NOT NULL DEFAULT 1,
-  `imagen` varchar(200) NOT NULL
+CREATE TABLE `roles` (
+  `id_rol` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` varchar(50) DEFAULT NULL,
+  `nivel_acceso` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id_rol`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `categoria`
---
-      
--- INSERT INTO `categoria` (`id_categoria`, `nombre`, `descripcion`, `activo`, `imagen`) VALUES
--- (1, 'Bebidas', 'Bebidas frías y calientes', 1, 'uploads/categorias/cat_6ab052645e72a.webp'),
--- (2, 'Comidas', 'comidas pollo', 1, 'uploads/categorias/cat_6ab05ca841570.jpeg');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `combo`
---
-
-CREATE TABLE `combo` (
-  `id_combo` int(11) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
-  `precio_total` decimal(10,2) NOT NULL,
-  `url_imagen_combo` varchar(255) DEFAULT NULL,
-  `activo` tinyint(1) NOT NULL DEFAULT 1
+CREATE TABLE `permisos` (
+  `id_permiso` int(11) NOT NULL AUTO_INCREMENT,
+  `clave` varchar(100) NOT NULL,
+  `descripcion` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_permiso`),
+  UNIQUE KEY `clave` (`clave`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `combo`
---
-
--- INSERT INTO `combo` (`id_combo`, `nombre`, `descripcion`, `precio_total`, `url_imagen_combo`, `activo`) VALUES
--- (1, 'Combo Ceibeño ', 'nuevo', 230.00, 'uploads/combos/combo_6ab052dc7fbad.png', 1),
--- (2, 'Combo Burras ', 'burras', 200.00, 'uploads/combos/combo_6ab062279b58e.jpeg', 1);
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `combo_detalle`
---
-
-CREATE TABLE `combo_detalle` (
-  `id_combo_detalle` int(11) NOT NULL,
-  `id_combo` int(11) NOT NULL,
-  `id_producto` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL DEFAULT 1,
-  `precio_individual` decimal(10,2) NOT NULL
+CREATE TABLE `rol_permiso` (
+  `id_rol` int(11) NOT NULL,
+  `id_permiso` int(11) NOT NULL,
+  PRIMARY KEY (`id_rol`, `id_permiso`),
+  KEY `fk_rolpermiso_permiso` (`id_permiso`),
+  CONSTRAINT `fk_rolpermiso_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_rolpermiso_permiso` FOREIGN KEY (`id_permiso`) REFERENCES `permisos` (`id_permiso`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `combo_detalle`
---
-
--- INSERT INTO `combo_detalle` (`id_combo_detalle`, `id_combo`, `id_producto`, `cantidad`, `precio_individual`) VALUES
--- (1, 1, 1, 1, 230.00),
--- (5, 2, 3, 1, 50.00),
--- (6, 2, 2, 1, 50.00),
--- (7, 2, 1, 2, 50.00);
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `empleados`
---
 
 CREATE TABLE `empleados` (
-  `id_empleado` int(11) NOT NULL,
+  `id_empleado` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
   `apellido` varchar(100) NOT NULL,
   `numero_telefono` varchar(20) DEFAULT NULL,
@@ -107,200 +49,37 @@ CREATE TABLE `empleados` (
   `id_rol` int(11) NOT NULL,
   `fecha_contratacion` date NOT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT 1,
-  `ultimo_acceso` datetime DEFAULT NULL
+  `ultimo_acceso` datetime DEFAULT NULL,
+  PRIMARY KEY (`id_empleado`),
+  UNIQUE KEY `usuario` (`usuario`),
+  KEY `fk_empleados_roles` (`id_rol`),
+  CONSTRAINT `fk_empleados_roles` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `empleados`
---
-
--- INSERT INTO `empleados` (`id_empleado`, `nombre`, `apellido`, `numero_telefono`, `usuario`, `contrasena_hash`, `id_rol`, `fecha_contratacion`, `activo`, `ultimo_acceso`) VALUES
--- (1, 'Carlos', 'Mendoza', '9999-8888', 'cmendoza', '$2y$10$eImiTXuWVxfM37uY4JANjOL.81c81v.8', 1, '2026-01-15', 1, '2026-09-26 19:20:41');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `facturas`
---
-
-CREATE TABLE `facturas` (
-  `id_factura` int(11) NOT NULL,
-  `numero_factura` varchar(30) NOT NULL,
-  `id_pedido` int(11) NOT NULL,
+CREATE TABLE `bitacora` (
+  `id_log` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_empleado` int(11) NOT NULL,
-  `id_metodo_pago` int(11) NOT NULL,
-  `fecha_hora_factura` datetime NOT NULL DEFAULT current_timestamp(),
-  `estado_factura` varchar(30) NOT NULL DEFAULT 'emitida',
-  `rtn_cliente` varchar(20) DEFAULT NULL,
-  `observaciones` varchar(255) DEFAULT NULL
+  `accion` varchar(100) NOT NULL,
+  `tabla` varchar(100) DEFAULT NULL,
+  `id_registro` varchar(50) DEFAULT NULL,
+  `detalle` text DEFAULT NULL,
+  `fecha_hora` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_log`),
+  KEY `fk_bitacora_empleado` (`id_empleado`),
+  CONSTRAINT `fk_bitacora_empleado` FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `factura_detalle`
---
-
-CREATE TABLE `factura_detalle` (
-  `id_factura_detalle` int(11) NOT NULL,
-  `id_factura` int(11) NOT NULL,
-  `id_producto` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL DEFAULT 1,
-  `precio_unitario` decimal(10,2) NOT NULL,
-  `descuento` decimal(10,2) NOT NULL DEFAULT 0.00
+CREATE TABLE `categoria` (
+  `id_categoria` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `imagen` varchar(200) NOT NULL,
+  PRIMARY KEY (`id_categoria`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `metas_diarias`
---
-
-CREATE TABLE `metas_diarias` (
-  `id_meta` int(11) NOT NULL,
-  `id_producto` int(11) NOT NULL,
-  `fecha` date NOT NULL,
-  `cantidad_meta` int(11) NOT NULL,
-  `ventas_reales` int(11) NOT NULL DEFAULT 0,
-  `porc_comparacion` decimal(10,2) NOT NULL,
-  `estadistica` varchar(150) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `metas_diarias`
---
-
--- INSERT INTO `metas_diarias` (`id_meta`, `id_producto`, `fecha`, `cantidad_meta`, `ventas_reales`, `porc_comparacion`, `estadistica`) VALUES
--- (2, 1, '2026-09-20', 50, 20, 40.00, 'Insuficiente'),
--- (3, 2, '2026-09-20', 30, 1, 3.33, 'Critico'),
--- (4, 3, '2026-09-20', 0, 0, 0.00, 'Sin ventas/Nulo'),
--- (5, 1, '2026-09-21', 50, 20, 40.00, 'Insuficiente'),
--- (6, 2, '2026-09-21', 20, 23, 115.00, 'Extraordinario'),
--- (7, 3, '2026-09-21', 32, 61, 190.63, 'Extraordinario'),
--- (8, 1, '2026-09-22', 20, 20, 100.00, 'Excelente'),
--- (9, 2, '2026-09-22', 30, 23, 76.67, 'Muy bueno'),
--- (10, 3, '2026-09-22', 24, 31, 129.17, 'Extraordinario'),
--- (11, 1, '2026-09-26', 5, 0, 0.00, 'Sin ventas/Nulo'),
--- (12, 2, '2026-09-26', 6, 0, 0.00, 'Sin ventas/Nulo'),
--- (13, 3, '2026-09-26', 14, 0, 0.00, 'Sin ventas/Nulo'),
--- (14, 1, '2026-09-27', 5, 0, 0.00, 'Sin ventas/Nulo'),
--- (15, 2, '2026-09-27', 6, 0, 0.00, 'Sin ventas/Nulo'),
--- (16, 3, '2026-09-27', 7, 0, 0.00, 'Sin ventas/Nulo'),
--- (17, 1, '2026-09-28', 5, 0, 0.00, 'Sin ventas/Nulo'),
--- (18, 2, '2026-09-28', 6, 0, 0.00, 'Sin ventas/Nulo'),
--- (19, 3, '2026-09-28', 7, 0, 0.00, 'Sin ventas/Nulo'),
--- (20, 1, '2026-09-29', 5, 0, 0.00, 'Sin ventas/Nulo'),
--- (21, 2, '2026-09-29', 6, 0, 0.00, 'Sin ventas/Nulo'),
--- (22, 3, '2026-09-29', 7, 0, 0.00, 'Sin ventas/Nulo');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `metodo_pago`
---
-
-CREATE TABLE `metodo_pago` (
-  `id_metodo_pago` int(11) NOT NULL,
-  `nombre` varchar(50) NOT NULL,
-  `activo` tinyint(1) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `pedidos`
---
-
-CREATE TABLE `pedidos` (
-  `id_pedido` int(11) NOT NULL,
-  `fecha_hora_pedido` datetime NOT NULL DEFAULT current_timestamp(),
-  `fecha_hora_entrega` datetime DEFAULT NULL,
-  `cliente` varchar(100) NOT NULL DEFAULT 'Cliente no especificado',
-  `id_empleado` int(11) NOT NULL,
-  `estado` enum('recibido','pendiente','preparacion','entregado','cancelado') NOT NULL DEFAULT 'pendiente',
-  `tipo_pedido` varchar(30) NOT NULL,
-  `observaciones` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `pedidos`
---
-
--- INSERT INTO `pedidos` (`id_pedido`, `fecha_hora_pedido`, `fecha_hora_entrega`, `cliente`, `id_empleado`, `estado`, `tipo_pedido`, `observaciones`) VALUES
--- (1, '2026-09-21 10:00:00', '2026-09-21 10:30:00', 'Juan Pérez', 1, 'entregado', 'Para llevar', 'Sin cebolla en el arroz'),
--- (2, '2026-09-21 11:15:00', '2026-09-21 11:45:00', 'Maria López', 1, 'entregado', 'Comer aquí', 'Mesa 4'),
--- (3, '2026-09-21 12:00:00', '2026-09-21 12:40:00', 'Carlos Gómez', 1, 'entregado', 'Domicilio', 'Entregar en el bloque B'),
--- (4, '2026-09-21 13:30:00', '2026-09-21 14:00:00', 'Ana Rodríguez', 1, 'entregado', 'Para llevar', 'Salsa extra'),
--- (5, '2026-09-21 14:10:00', '2026-09-21 14:35:00', 'Roberto Suazo', 1, 'entregado', 'Comer aquí', 'Mesa 1'),
--- (6, '2026-09-26 15:00:00', '2026-09-26 15:25:00', 'Laura Fernández', 1, 'entregado', 'Para llevar', 'Sin picante'),
--- (7, '2026-09-27 15:00:00', '2026-09-27 15:25:00', 'Laura Fernández', 1, 'ENTREGADO', 'Para llevar', 'Sin picante'),
--- (8, '2026-09-28 12:30:00', '2026-09-28 12:55:00', 'Laura Fernández', 1, 'entregado', 'Para llevar', 'Sin picante'),
--- (9, '2026-09-28 12:30:00', '2026-09-28 12:55:00', 'Laura Fernández', 1, 'entregado', 'Para llevar', 'Sin picante'),
--- (10, '2026-09-29 12:30:00', '2026-09-29 12:55:00', 'Laura Fernández', 1, 'entregado', 'Para llevar', 'Sin picante');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `pedidos_detalle`
---
-
-CREATE TABLE `pedidos_detalle` (
-  `id_detalle` int(11) NOT NULL,
-  `id_pedido` int(11) NOT NULL,
-  `id_producto` int(11) DEFAULT NULL,
-  `id_combo` int(11) DEFAULT NULL,
-  `cantidad` int(11) NOT NULL DEFAULT 1,
-  `precio_unitario` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `pedidos_detalle`
--- --
-
--- INSERT INTO `pedidos_detalle` (`id_detalle`, `id_pedido`, `id_producto`, `id_combo`, `cantidad`, `precio_unitario`) VALUES
--- (1, 1, 1, NULL, 1, 250.00),
--- (2, 1, 3, NULL, 1, 25.00),
--- (3, 2, 2, NULL, 2, 120.00),
--- (4, 3, NULL, 1, 1, 230.00),
--- (5, 4, NULL, 2, 1, 150.00),
--- (6, 4, 3, NULL, 2, 25.00),
--- (7, 5, 1, NULL, 1, 250.00),
--- (8, 5, 2, NULL, 1, 120.00),
--- (9, 6, 2, NULL, 1, 120.00),
--- (10, 6, 3, NULL, 1, 25.00),
--- (11, 7, 2, NULL, 6, 120.00),
--- (12, 7, 1, NULL, 4, 230.00),
--- (13, 7, 3, 1, 12, 25.00),
--- (14, 8, NULL, 1, 2, 120.00),
--- (15, 8, NULL, 1, 1, 25.00),
--- (16, 10, 1, 2, 1, 120.00),
--- (17, 10, 1, 2, 1, 25.00);
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `ordenes_cocina`
--- El detalle de productos ya vive en `pedidos_detalle`, aquí solo se
--- controla el estado de preparación del pedido en cocina.
---
-
-CREATE TABLE `ordenes_cocina` (
-  `id_orden_cocina` int(11) NOT NULL,
-  `id_pedido` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL DEFAULT 1,
-  `estado_cocina` enum('pendiente','preparacion','entregado','cancelado') NOT NULL DEFAULT 'pendiente',
-  `hora_recibido` datetime DEFAULT NULL,
-  `hora_entrega` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `productos`
---
 
 CREATE TABLE `productos` (
-  `id_producto` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL AUTO_INCREMENT,
   `codigo_interno` varchar(30) NOT NULL,
   `nombre` varchar(150) NOT NULL,
   `precio` decimal(10,2) NOT NULL,
@@ -308,361 +87,157 @@ CREATE TABLE `productos` (
   `url_imagen` varchar(255) DEFAULT NULL,
   `disponibilidad` tinyint(1) NOT NULL DEFAULT 1,
   `es_extra` tinyint(1) NOT NULL DEFAULT 0,
-  `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
+  `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_producto`),
+  KEY `fk_productos_categoria` (`id_categoria`),
+  CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `productos`
---
+CREATE TABLE `combo` (
+  `id_combo` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `precio_total` decimal(10,2) NOT NULL,
+  `url_imagen_combo` varchar(255) DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id_combo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- INSERT INTO `productos` (`id_producto`, `codigo_interno`, `nombre`, `precio`, `id_categoria`, `url_imagen`, `disponibilidad`, `es_extra`, `fecha_creacion`) VALUES
--- (1, '0001', 'Arros Chino', 250.00, 1, 'uploads/productos/prod_6ab052afd31f1.webp', 1, 0, '2026-09-20 15:39:59'),
--- (2, '0002', 'Pollo chuco', 120.00, 1, 'uploads/productos/prod_6ab059cc3d7dd.webp', 1, 0, '2026-09-20 16:10:20'),
--- (3, '0003', 'Papas Fritas', 25.00, 2, 'uploads/productos/prod_6ab059f13fe4a.webp', 1, 0, '2026-09-20 16:10:57');
+CREATE TABLE `combo_detalle` (
+  `id_combo_detalle` int(11) NOT NULL AUTO_INCREMENT,
+  `id_combo` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1,
+  `precio_individual` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id_combo_detalle`),
+  KEY `fk_combodet_combo` (`id_combo`),
+  KEY `fk_combodet_producto` (`id_producto`),
+  CONSTRAINT `fk_combodet_combo` FOREIGN KEY (`id_combo`) REFERENCES `combo` (`id_combo`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_combodet_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `roles`
---
-
-CREATE TABLE `roles` (
-  `id_rol` int(11) NOT NULL,
+CREATE TABLE `metodo_pago` (
+  `id_metodo_pago` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
-  `descripcion` varchar(50) DEFAULT NULL,
-  `nivel_acceso` int(11) NOT NULL DEFAULT 1
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id_metodo_pago`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- TABLA DE PERMISOS
-CREATE TABLE `permisos` (
-  `id_permiso`  int(11) NOT NULL,
-  `clave`       varchar(100) NOT NULL,
-  `descripcion` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Índices para `permisos`
-ALTER TABLE `permisos`
-  ADD PRIMARY KEY (`id_permiso`),
-  ADD UNIQUE KEY `clave` (`clave`);
-
--- AUTO_INCREMENT para `permisos`
-
-ALTER TABLE `permisos`
-  MODIFY `id_permiso` int(11) NOT NULL AUTO_INCREMENT;
-
--- TABLA ROL_PERMISO
-CREATE TABLE `rol_permiso` (
-  `id_rol`     int(11) NOT NULL,
-  `id_permiso` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Índices para `rol_permiso`
-ALTER TABLE `rol_permiso`
-  ADD PRIMARY KEY (`id_rol`, `id_permiso`),
-  ADD KEY `fk_rolpermiso_permiso` (`id_permiso`);
-
---
--- Restricciones para `rol_permiso`
---
-ALTER TABLE `rol_permiso`
-  ADD CONSTRAINT `fk_rolpermiso_rol`
-    FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_rolpermiso_permiso`
-    FOREIGN KEY (`id_permiso`) REFERENCES `permisos` (`id_permiso`)
-    ON DELETE CASCADE ON UPDATE CASCADE;
-
--- TABLA BITACORA
-CREATE TABLE `bitacora` (
-  `id_log`      int(20) NOT NULL,
+CREATE TABLE `pedidos` (
+  `id_pedido` int(11) NOT NULL AUTO_INCREMENT,
+  `fecha_hora_pedido` datetime NOT NULL DEFAULT current_timestamp(),
+  `fecha_hora_entrega` datetime DEFAULT NULL,
+  `cliente` varchar(100) NOT NULL DEFAULT 'Cliente no especificado',
   `id_empleado` int(11) NOT NULL,
-  `accion`      varchar(100) NOT NULL,
-  `tabla`       varchar(100) DEFAULT NULL,
-  `id_registro` varchar(50)  DEFAULT NULL,
-  `detalle`     text DEFAULT NULL,
-  `fecha_hora`  datetime NOT NULL DEFAULT current_timestamp()
+  `estado` enum('recibido','pendiente','preparacion','entregado','cancelado') NOT NULL DEFAULT 'pendiente',
+  `tipo_pedido` varchar(30) NOT NULL,
+  `observaciones` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id_pedido`),
+  KEY `fk_pedidos_empleados` (`id_empleado`),
+  CONSTRAINT `fk_pedidos_empleados` FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Índice para `bitacora`
-ALTER TABLE `bitacora`
-  ADD PRIMARY KEY (`id_log`),
-  ADD KEY `fk_bitacora_empleado` (`id_empleado`);
+CREATE TABLE `pedidos_detalle` (
+  `id_detalle` int(11) NOT NULL AUTO_INCREMENT,
+  `id_pedido` int(11) NOT NULL,
+  `id_producto` int(11) DEFAULT NULL,
+  `id_combo` int(11) DEFAULT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id_detalle`),
+  KEY `fk_pedidosdet_pedido` (`id_pedido`),
+  KEY `fk_pedidosdet_combo` (`id_combo`),
+  KEY `fk_pedidosdet_producto` (`id_producto`),
+  CONSTRAINT `fk_pedidosdet_combo` FOREIGN KEY (`id_combo`) REFERENCES `combo` (`id_combo`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_pedidosdet_pedido` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_pedidosdet_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON UPDATE CASCADE,
+  CONSTRAINT `chk_pedidosdet_cantidad` CHECK (`cantidad` > 0),
+  CONSTRAINT `chk_pedidosdet_precio` CHECK (`precio_unitario` >= 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE `bitacora`
-  MODIFY `id_log` bigint(20) NOT NULL AUTO_INCREMENT;
+CREATE TABLE `ordenes_cocina` (
+  `id_orden_cocina` int(11) NOT NULL AUTO_INCREMENT,
+  `id_pedido` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1,
+  `estado_cocina` enum('pendiente','preparacion','entregado','cancelado') NOT NULL DEFAULT 'pendiente',
+  `hora_recibido` datetime DEFAULT NULL,
+  `hora_entrega` datetime DEFAULT NULL,
+  PRIMARY KEY (`id_orden_cocina`),
+  KEY `fk_ordenescocina_pedido` (`id_pedido`),
+  CONSTRAINT `fk_ordenescocina_pedido` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Restriccion
-ALTER TABLE `bitacora`
-  ADD CONSTRAINT `fk_bitacora_empleado`
-    FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`)
-    ON DELETE RESTRICT ON UPDATE CASCADE;
+CREATE TABLE `facturas` (
+  `id_factura` int(11) NOT NULL AUTO_INCREMENT,
+  `numero_factura` varchar(30) NOT NULL,
+  `id_pedido` int(11) NOT NULL,
+  `id_empleado` int(11) NOT NULL,
+  `id_metodo_pago` int(11) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `isv` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `total` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `fecha_hora_factura` datetime NOT NULL DEFAULT current_timestamp(),
+  `estado_factura` varchar(30) NOT NULL DEFAULT 'emitida',
+  `rtn_cliente` varchar(20) DEFAULT NULL,
+  `observaciones` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id_factura`),
+  UNIQUE KEY `numero_factura` (`numero_factura`),
+  KEY `fk_facturas_pedido` (`id_pedido`),
+  KEY `fk_facturas_empleado` (`id_empleado`),
+  KEY `fk_facturas_metodopago` (`id_metodo_pago`),
+  CONSTRAINT `fk_facturas_empleado` FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_facturas_metodopago` FOREIGN KEY (`id_metodo_pago`) REFERENCES `metodo_pago` (`id_metodo_pago`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_facturas_pedido` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `roles`
---
+CREATE TABLE `factura_detalle` (
+  `id_factura_detalle` int(11) NOT NULL AUTO_INCREMENT,
+  `id_factura` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `descuento` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `subtotal_linea` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `isv_linea` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `total_linea` decimal(10,2) NOT NULL DEFAULT 0.00,
+  PRIMARY KEY (`id_factura_detalle`),
+  KEY `fk_facturadet_factura` (`id_factura`),
+  KEY `fk_facturadet_producto` (`id_producto`),
+  CONSTRAINT `fk_facturadet_factura` FOREIGN KEY (`id_factura`) REFERENCES `facturas` (`id_factura`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_facturadet_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- INSERT INTO `roles` (`id_rol`, `nombre`, `descripcion`, `nivel_acceso`) VALUES
--- (1, 'Administrador', 'Acceso total al sistema', 1);
+CREATE TABLE `metas_diarias` (
+  `id_meta` int(11) NOT NULL AUTO_INCREMENT,
+  `id_producto` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `cantidad_meta` int(11) NOT NULL,
+  `ventas_reales` int(11) NOT NULL DEFAULT 0,
+  `porc_comparacion` decimal(10,2) NOT NULL,
+  `estadistica` varchar(150) NOT NULL,
+  PRIMARY KEY (`id_meta`),
+  KEY `fk_metasdiarias_producto` (`id_producto`),
+  CONSTRAINT `fk_metasdiarias_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Índices para tablas volcadas
---
+INSERT INTO `roles` (`id_rol`, `nombre`, `descripcion`, `nivel_acceso`) VALUES
+(1, 'Administrador', 'Acceso total al sistema', 1);
 
---
--- Indices de la tabla `categoria`
---
-ALTER TABLE `categoria`
-  ADD PRIMARY KEY (`id_categoria`);
+INSERT INTO `empleados` (`id_empleado`, `nombre`, `apellido`, `numero_telefono`, `usuario`, `contrasena_hash`, `id_rol`, `fecha_contratacion`, `activo`, `ultimo_acceso`) VALUES
+(1, 'Carlos', 'Mendoza', '9999-8888', 'cmendoza', '$2y$10$eImiTXuWVxfM37uY4JANjOL.81c81v.8', 1, '2026-01-15', 1, '2026-09-26 19:20:41');
 
---
--- Indices de la tabla `combo`
---
-ALTER TABLE `combo`
-  ADD PRIMARY KEY (`id_combo`);
+INSERT INTO `permisos` (`clave`, `descripcion`) VALUES
+('usuarios.gestionar', 'Crear, editar y desactivar empleados'),
+('roles.gestionar', 'Administrar roles y permisos'),
+('productos.gestionar', 'Administrar productos, categorias y combos'),
+('pedidos.gestionar', 'Crear y modificar pedidos'),
+('cocina.ver', 'Ver y actualizar ordenes de cocina'),
+('facturas.gestionar', 'Emitir y anular facturas'),
+('reportes.ver', 'Ver reportes y metas diarias'),
+('bitacora.ver', 'Consultar la bitacora del sistema');
 
---
--- Indices de la tabla `combo_detalle`
---
-ALTER TABLE `combo_detalle`
-  ADD PRIMARY KEY (`id_combo_detalle`),
-  ADD KEY `fk_combodet_combo` (`id_combo`),
-  ADD KEY `fk_combodet_producto` (`id_producto`);
-
---
--- Indices de la tabla `empleados`
---
-ALTER TABLE `empleados`
-  ADD PRIMARY KEY (`id_empleado`),
-  ADD UNIQUE KEY `usuario` (`usuario`),
-  ADD KEY `fk_empleados_roles` (`id_rol`);
-
---
--- Indices de la tabla `facturas`
---
-ALTER TABLE `facturas`
-  ADD PRIMARY KEY (`id_factura`),
-  ADD UNIQUE KEY `numero_factura` (`numero_factura`),
-  ADD KEY `fk_facturas_pedido` (`id_pedido`),
-  ADD KEY `fk_facturas_empleado` (`id_empleado`),
-  ADD KEY `fk_facturas_metodopago` (`id_metodo_pago`);
-
---
--- Indices de la tabla `factura_detalle`
---
-ALTER TABLE `factura_detalle`
-  ADD PRIMARY KEY (`id_factura_detalle`),
-  ADD KEY `fk_facturadet_factura` (`id_factura`),
-  ADD KEY `fk_facturadet_producto` (`id_producto`);
-
---
--- Indices de la tabla `metas_diarias`
---
-ALTER TABLE `metas_diarias`
-  ADD PRIMARY KEY (`id_meta`),
-  ADD KEY `fk_metasdiarias_producto` (`id_producto`);
-
---
--- Indices de la tabla `metodo_pago`
---
-ALTER TABLE `metodo_pago`
-  ADD PRIMARY KEY (`id_metodo_pago`);
-
---
--- Indices de la tabla `ordenes_cocina`
---
-ALTER TABLE `ordenes_cocina`
-  ADD PRIMARY KEY (`id_orden_cocina`),
-  ADD KEY `fk_ordenescocina_pedido` (`id_pedido`);
-
---
--- Indices de la tabla `pedidos`
---
-ALTER TABLE `pedidos`
-  ADD PRIMARY KEY (`id_pedido`),
-  ADD KEY `fk_pedidos_empleados` (`id_empleado`);
-
---
--- Indices de la tabla `pedidos_detalle`
---
-ALTER TABLE `pedidos_detalle`
-  ADD PRIMARY KEY (`id_detalle`),
-  ADD KEY `fk_pedidosdet_pedido` (`id_pedido`),
-  ADD KEY `fk_pedidosdet_combo` (`id_combo`),
-  ADD KEY `fk_pedidosdet_producto` (`id_producto`);
-
---
--- Indices de la tabla `productos`
---
-ALTER TABLE `productos`
-  ADD PRIMARY KEY (`id_producto`),
-  ADD KEY `fk_productos_categoria` (`id_categoria`);
-
---
--- Indices de la tabla `roles`
---
-ALTER TABLE `roles`
-  ADD PRIMARY KEY (`id_rol`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `categoria`
---
-ALTER TABLE `categoria`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT de la tabla `combo`
---
-ALTER TABLE `combo`
-  MODIFY `id_combo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT de la tabla `combo_detalle`
---
-ALTER TABLE `combo_detalle`
-  MODIFY `id_combo_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT de la tabla `empleados`
---
-ALTER TABLE `empleados`
-  MODIFY `id_empleado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT de la tabla `facturas`
---
-ALTER TABLE `facturas`
-  MODIFY `id_factura` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `factura_detalle`
---
-ALTER TABLE `factura_detalle`
-  MODIFY `id_factura_detalle` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `metas_diarias`
---
-ALTER TABLE `metas_diarias`
-  MODIFY `id_meta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
-
---
--- AUTO_INCREMENT de la tabla `metodo_pago`
---
-ALTER TABLE `metodo_pago`
-  MODIFY `id_metodo_pago` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `ordenes_cocina`
---
-ALTER TABLE `ordenes_cocina`
-  MODIFY `id_orden_cocina` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `pedidos`
---
-ALTER TABLE `pedidos`
-  MODIFY `id_pedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT de la tabla `pedidos_detalle`
---
-ALTER TABLE `pedidos_detalle`
-  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT de la tabla `productos`
---
-ALTER TABLE `productos`
-  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT de la tabla `roles`
---
-ALTER TABLE `roles`
-  MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `combo_detalle`
---
-ALTER TABLE `combo_detalle`
-  ADD CONSTRAINT `fk_combodet_combo` FOREIGN KEY (`id_combo`) REFERENCES `combo` (`id_combo`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_combodet_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `empleados`
---
-ALTER TABLE `empleados`
-  ADD CONSTRAINT `fk_empleados_roles` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `facturas`
---
-ALTER TABLE `facturas`
-  ADD CONSTRAINT `fk_facturas_empleado` FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_facturas_metodopago` FOREIGN KEY (`id_metodo_pago`) REFERENCES `metodo_pago` (`id_metodo_pago`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_facturas_pedido` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `factura_detalle`
---
-ALTER TABLE `factura_detalle`
-  ADD CONSTRAINT `fk_facturadet_factura` FOREIGN KEY (`id_factura`) REFERENCES `facturas` (`id_factura`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_facturadet_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `metas_diarias`
---
-ALTER TABLE `metas_diarias`
-  ADD CONSTRAINT `fk_metasdiarias_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `ordenes_cocina`
---
-ALTER TABLE `ordenes_cocina`
-  ADD CONSTRAINT `fk_ordenescocina_pedido` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `pedidos`
---
-ALTER TABLE `pedidos`
-  ADD CONSTRAINT `fk_pedidos_empleados` FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`) ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `pedidos_detalle`
---
-ALTER TABLE `pedidos_detalle`
-  ADD CONSTRAINT `fk_pedidosdet_combo` FOREIGN KEY (`id_combo`) REFERENCES `combo` (`id_combo`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_pedidosdet_pedido` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_pedidosdet_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `chk_pedidosdet_cantidad` CHECK (`cantidad` > 0),
-  ADD CONSTRAINT `chk_pedidosdet_precio` CHECK (`precio_unitario` >= 0);
-
---
--- Filtros para la tabla `productos`
---
-ALTER TABLE `productos`
-  ADD CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`) ON UPDATE CASCADE;
-COMMIT;
-
--- Modificacion de tabla facturas
-ALTER TABLE `facturas`
-  ADD COLUMN `subtotal` decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `id_metodo_pago`,
-  ADD COLUMN `isv`      decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `subtotal`,
-  ADD COLUMN `total`    decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `isv`;
-
--- Modificacion de tabla factura_detalle
-ALTER TABLE `factura_detalle`
-  ADD COLUMN `subtotal_linea` decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `descuento`,-- hay que recoordar que estos campos son de tipo numerico
-  ADD COLUMN `isv_linea`      decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `subtotal_linea`, -- a lo cual se pondran en 0 para iniciar cada campo y que no
-  ADD COLUMN `total_linea`    decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `isv_linea`;	-- aparezca con datos errones o inexistente
+INSERT INTO `rol_permiso` (`id_rol`, `id_permiso`)
+SELECT 1, `id_permiso` FROM `permisos`;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
