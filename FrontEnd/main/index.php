@@ -116,7 +116,9 @@ $base_url = ($pos !== false) ? substr($script_path, 0, $pos) . '/FrontEnd' : '';
                 -->
             </ul>
         </div>
-        <!--
+
+
+
         <div class="footer">
             <ul class="menu">
                 <li class="menu-item menu-item-static">
@@ -145,7 +147,10 @@ $base_url = ($pos !== false) ? substr($script_path, 0, $pos) . '/FrontEnd' : '';
                 </div>
             </div>
         </div>
-        -->
+
+
+
+        
     </div>
     <main id="content-main">
     </main>
