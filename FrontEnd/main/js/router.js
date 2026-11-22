@@ -44,7 +44,7 @@ function ajax(url) {
                 initToggleBuscador();
                 if (typeof initCarrito === 'function') initCarrito();
                 if (typeof initCatalogoItems === 'function') initCatalogoItems();
-                if (typeof initModalComboCatalogo === 'function') initModalComboCatalogo();
+                if (typeof initDetalleCatalogo === 'function') initDetalleCatalogo();
             }else if(url.includes('Cocina')) {
                 initCocina();
             }

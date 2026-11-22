@@ -4,102 +4,81 @@
     <h4>Gestiona y organiza tus productos</h4>
 </header>
 <!-- Categorias -->
-<section class="container container-secondary">
-    <div class="header-card-container">
-        <div class="header-left">
-            <div class="icon-image">
-                <i class='bx bx-category-alt'></i>
-                <span class="titulo">Categorias de productos</span>
-            </div>
-            <div class="search-general">
-                <i class='bx bx-search-alt-2' ></i>
-                <input type="search" placeholder="Buscar categoria" id="searchInputCat">
-            </div>
+<section class="container-secondary seccion">
+    <div class="seccion__header">
+        <div class="seccion__icono"><i class='bx bx-category-alt'></i></div>
+        <span class="seccion__titulo">Categorias de productos</span>
+        <div class="seccion__search">
+            <i class='bx bx-search-alt-2' ></i>
+            <input type="search" placeholder="Buscar categoria" id="searchInputCat">
         </div>
-        <div class="button-general" id="agregar-categoria">
-            <a>
-                <i class='bx bx-plus' ></i>
-                <span>Nueva categoría</span>
-            </a>
-        </div>
+        <button type="button" class="seccion__accion btn-ui btn-ui--primary" id="agregar-categoria">
+            <i class='bx bx-plus' ></i>
+            <span>Nueva categoría</span>
+        </button>
     </div>
-
-<div class="contenedor-categorias" id="contenedor-categorias"></div>
-
-    <div class="paginacion" id="paginacion-categorias"></div>
+    <div class="seccion__body">
+        <div class="contenedor-categorias" id="contenedor-categorias"></div>
+        <div class="paginacion" id="paginacion-categorias"></div>
+    </div>
 </section>
 
 
 <!-- productos -->
 <!--Where is the doom eternium, in this time. I need it-->
-<section class="container container-secondary">
-    <div class="header-card-container">
-        <div class="header-left">
-            <div class="icon-image">
-                <i class='bx bx-package'></i>
-                <span class="titulo">Productos</span>
-            </div>
-            <div class="search-general">
-                <i class='bx bx-search-alt-2'></i>
-                <input type="search" placeholder="Buscar producto" id="searchInputProd">
-            </div>
+<section class="container-secondary seccion">
+    <div class="seccion__header">
+        <div class="seccion__icono"><i class='bx bx-package'></i></div>
+        <span class="seccion__titulo">Productos</span>
+        <div class="seccion__search">
+            <i class='bx bx-search-alt-2'></i>
+            <input type="search" placeholder="Buscar producto" id="searchInputProd">
         </div>
-
-
-        <div class="button-general" id="agregar-producto">
-            <a>
-                <i class='bx bx-plus' ></i>
-                <span>Nuevo producto</span>
-            </a>
+        <button type="button" class="seccion__accion btn-ui btn-ui--primary" id="agregar-producto">
+            <i class='bx bx-plus' ></i>
+            <span>Nuevo producto</span>
+        </button>
+    </div>
+    <div class="seccion__body">
+        <div class="table-container" id="table-container">
+            <table class="styled-table" id="table-content">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <!-- <th>Descripción</th> -->
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                        <th>Disponible</th>
+                        <th>Complemento</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="body-container-table"></tbody>
+            </table>
         </div>
+        <div class="paginacion" id="paginacion-productos"></div>
     </div>
-
-    <div class="table-container" id="table-container">
-        <table class="styled-table" id="table-content">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Imagen</th>
-                    <th>Nombre</th>
-                    <!-- <th>Descripción</th> -->
-                    <th>Precio</th>
-                    <th>Categoría</th>
-                    <th>Disponible</th>
-                    <th>Complemento</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="body-container-table"></tbody>
-        </table>
-    </div>
-    <div class="paginacion" id="paginacion-productos"></div>
 </section>
 <!-- combos -->
-<section class="container container-secondary">
-<div class="header-card-container">
-    <div class="header-left">
-        <div class="icon-image">
-            <i class='bx bx-gift'></i>
-            <span class="titulo">Combos</span>
-        </div>
-        <div class="search-general">
+<section class="container-secondary seccion">
+    <div class="seccion__header">
+        <div class="seccion__icono"><i class='bx bx-gift'></i></div>
+        <span class="seccion__titulo">Combos</span>
+        <div class="seccion__search">
             <i class='bx bx-search-alt-2'></i>
-            <!-- CAMBIADO AQUÍ DE searchInputProd A searchInputCombo -->
             <input type="search" placeholder="Buscar combo" id="searchInputCombo">
         </div>
-    </div>
-
-    <div class="button-general" id="agregar-combos">
-        <a>
+        <button type="button" class="seccion__accion btn-ui btn-ui--primary" id="agregar-combos">
             <i class='bx bx-plus' ></i>
             <span>Nuevo combo</span>
-        </a>
+        </button>
     </div>
-</div>
-<div class="contenedor-categorias" id="contenedor-combos"></div>
-
-
-    <div class="paginacion" id="paginacion-combos"></div>
+    <div class="seccion__body">
+        <div class="contenedor-categorias" id="contenedor-combos"></div>
+        <div class="paginacion" id="paginacion-combos"></div>
+    </div>
 </section>
 
 
@@ -127,8 +106,8 @@
                 </div >
             </div>
             <div class="contenido-botones-modal">
-                <button class="emergente-btn" id="btn-cancel-category">Cancelar</button>
-                <button class="confirm-btn" id="btn-POST-category">Confirmar categoria</button>
+                <button class="emergente-btn btn-ui btn-ui--secondary btn-ui--lg" id="btn-cancel-category">Cancelar</button>
+                <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="btn-POST-category">Confirmar categoria</button>
             </div>
         </section>
  </dialog>
@@ -154,8 +133,8 @@
             </div>
         </div>
         <div class="contenido-botones-modal">
-            <button class="emergente-btn" id="btn-cancel-category-editar">Cancelar</button>
-            <button class="confirm-btn" id="btn-PUT-category">Confirmar cambios</button>
+            <button class="emergente-btn btn-ui btn-ui--secondary btn-ui--lg" id="btn-cancel-category-editar">Cancelar</button>
+            <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="btn-PUT-category">Confirmar cambios</button>
         </div>
     </section>
 </dialog>
@@ -206,7 +185,7 @@
                         <span>Cantidad total</span>
                         <input type="number" name="" id="cant-prod-cmb" min=1 max=9999 placeholder="Ejemplo: 2" value="1">
                     </div>
-                    <button class="confirm-btn" id="meter-datos-prod-cmb">Agregar producto</button>
+                    <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="meter-datos-prod-cmb">Agregar producto</button>
                 </fieldset>
                 
                 
@@ -224,8 +203,8 @@
             </div>
         </div>
         <div class="contenido-botones-modal">
-            <button class="emergente-btn" id="btn-cancel-combos">Cancelar</button>
-            <button class="confirm-btn" id="AgregarComboNuevo">Confirmar producto</button>
+            <button class="emergente-btn btn-ui btn-ui--secondary btn-ui--lg" id="btn-cancel-combos">Cancelar</button>
+            <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="AgregarComboNuevo">Confirmar producto</button>
         </div>
     </section>
 </dialog>
@@ -275,7 +254,7 @@
                         <span>Cantidad total</span>
                         <input type="number" name="" id="cant-prod-cmb-edit" min=1 max=9999 placeholder="Ejemplo: 2" value="1">
                     </div>
-                    <button class="confirm-btn" id="meter-datos-prod-cmb-edit">Agregar producto</button>
+                    <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="meter-datos-prod-cmb-edit">Agregar producto</button>
                 </fieldset>
                 
                 
@@ -293,8 +272,8 @@
             </div>
         </div>
         <div class="contenido-botones-modal">
-            <button class="emergente-btn" id="btn-cancel-combos-edit">Cancelar</button>
-            <button class="confirm-btn" id="btn-PUT-combos-edit">Confirmar producto</button>
+            <button class="emergente-btn btn-ui btn-ui--secondary btn-ui--lg" id="btn-cancel-combos-edit">Cancelar</button>
+            <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="btn-PUT-combos-edit">Confirmar producto</button>
         </div>
     </section>
 </dialog>
@@ -311,7 +290,7 @@
         <img id="img-preview-content" src="" alt="Vista previa" class="imagePreview">
     </section>
     <div class="contenido-botones-modal">
-        <button class="confirm-btn" id="btn-cancel-viewImg">Regresar</button>
+        <button class="btn-ui btn-ui--ghost btn-ui--lg btn-ui--block" id="btn-cancel-viewImg">Regresar</button>
     </div>
 </dialog>
 
@@ -345,8 +324,8 @@
             ¿Esta seguro que quiere realizar esta acción?
         </p>
         <div>
-            <button class="cancelar-desactivar" id="cancelar-desactivar">No, regresar</button>
-            <button class="confirmar-desactivar" id="confirmar-desactivar">Si, continuar</button>
+            <button class="cancelar-desactivar btn-ui btn-ui--ghost btn-ui--lg" id="cancelar-desactivar">No, regresar</button>
+            <button class="confirmar-desactivar btn-ui btn-ui--secondary btn-ui--lg" id="confirmar-desactivar">Si, continuar</button>
             
         </div>
     </section>
@@ -363,8 +342,8 @@
             ¿Esta seguro que quiere realizar esta acción?
         </p>
         <div>
-            <button class="cancelar-desactivar" id="cancelar-desactivar-combo">No, regresar</button>
-            <button class="confirmar-desactivar" id="confirmar-desactivar-combo">Si, continuar</button>
+            <button class="cancelar-desactivar btn-ui btn-ui--ghost btn-ui--lg" id="cancelar-desactivar-combo">No, regresar</button>
+            <button class="confirmar-desactivar btn-ui btn-ui--secondary btn-ui--lg" id="confirmar-desactivar-combo">Si, continuar</button>
         </div>
     </section>
 </dialog>
@@ -382,8 +361,8 @@
             Esta acción no podrá revertirse
         </p>
         <div>
-            <button class="cancelar-desactivar" id="cancelar-eliminar-combo">No, regresar</button>
-            <button class="confirmar-desactivar" id="confirmar-eliminar-combo">Sí, continuar</button>
+            <button class="cancelar-desactivar btn-ui btn-ui--ghost btn-ui--lg" id="cancelar-eliminar-combo">No, regresar</button>
+            <button class="confirmar-desactivar btn-ui btn-ui--secondary btn-ui--lg" id="confirmar-eliminar-combo">Sí, continuar</button>
         </div>
     </section>
 </dialog>
@@ -400,8 +379,8 @@
             Esta accion no podra revertirse
         </p>
         <div>
-            <button class="cancelar-desactivar" id="cancelar-eliminar">No, regresar</button>
-            <button class="confirmar-desactivar" id="confirmar-eliminar">Sí, continuar</button>
+            <button class="cancelar-desactivar btn-ui btn-ui--ghost btn-ui--lg" id="cancelar-eliminar">No, regresar</button>
+            <button class="confirmar-desactivar btn-ui btn-ui--secondary btn-ui--lg" id="confirmar-eliminar">Sí, continuar</button>
         </div>
     </section>
 </dialog>
@@ -459,8 +438,8 @@
             </div>
 
             <div class="contenido-botones-modal">
-                <button class="emergente-btn" id="btn-cancel-product">Cancelar</button>
-                <button class="confirm-btn" id="btn-POST-producto">Confirmar producto</button>
+                <button class="emergente-btn btn-ui btn-ui--secondary btn-ui--lg" id="btn-cancel-product">Cancelar</button>
+                <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="btn-POST-producto">Confirmar producto</button>
             </div>
         </section>
  </dialog>
@@ -482,8 +461,8 @@
             
         
         <div>
-            <button class="cancelar-desactivar" id="cancelar-eliminar-P">No, regresar</button>
-            <button class="confirmar-desactivar" id="confirmar-eliminar-P">Sí, continuar</button>
+            <button class="cancelar-desactivar btn-ui btn-ui--ghost btn-ui--lg" id="cancelar-eliminar-P">No, regresar</button>
+            <button class="confirmar-desactivar btn-ui btn-ui--secondary btn-ui--lg" id="confirmar-eliminar-P">Sí, continuar</button>
         </div>
     </section>
 </dialog>
@@ -541,8 +520,8 @@
             </div>
 
             <div class="contenido-botones-modal">
-                <button class="emergente-btn" id="btn-cancel-product-edit">Cancelar</button>
-                <button class="confirm-btn" id="btn-PUT-producto-edit">Confirmar producto</button>
+                <button class="emergente-btn btn-ui btn-ui--secondary btn-ui--lg" id="btn-cancel-product-edit">Cancelar</button>
+                <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="btn-PUT-producto-edit">Confirmar producto</button>
             </div>
         </section>
  </dialog>

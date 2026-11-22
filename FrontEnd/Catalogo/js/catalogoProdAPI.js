@@ -44,16 +44,35 @@ function initCatalogoAPI() {
             const urlImagen = `${window.BASE_URL}/${urlRelativa}`;
 
             const categoriaNombre = item.categoria_nombre || 'Sin categoría';
+            const esCombo = Boolean(item.esCombo);
+            const esExtra = !esCombo && String(item.es_extra) === '1';
+
+            const claseTipo = esCombo
+                ? ' combo-card tarjeta-catalogo--combo'
+                : esExtra
+                    ? ' extra-card tarjeta-catalogo--extra'
+                    : ' tarjeta-catalogo--producto';
+
+            const textoAccion = 'Ver detalle';
+            const descripcion = item.descripcion ? String(item.descripcion).trim() : '';
+            const descripcionHtml = descripcion
+                ? `<p class="tarjeta-catalogo__descripcion">${descripcion}</p>`
+                : '';
 
             html += `
-                <article class="producto-card${item.esCombo ? ' combo-card' : ''}${(!item.esCombo && String(item.es_extra) === '1') ? ' extra-card' : ''}" data-nombre="${item.nombre}" data-id="${item.id}">
-                    <img src="${urlImagen}" alt="${item.nombre}">
-                    <div class="producto-info">
-                        <h3>${item.nombre}</h3>
-                        <p>${categoriaNombre}</p>
-                        <div class="productos-footer">
+                <article class="producto-card tarjeta-catalogo${claseTipo}" data-nombre="${item.nombre}" data-id="${item.id}">
+                    <div class="tarjeta-catalogo__media">
+                        <img src="${urlImagen}" alt="${item.nombre}">
+                        <!-- Espacio reservado: el badge rojo se mostrará cuando exista el dato de descuento -->
+                    </div>
+                    <div class="tarjeta-catalogo__cuerpo">
+                        <span class="tarjeta-catalogo__categoria">${categoriaNombre}</span>
+                        <h3 class="tarjeta-catalogo__nombre">${item.nombre}</h3>
+                        <div class="tarjeta-catalogo__precios">
                             <span class="precio-producto-catalogo">${item.precio} Lps</span>
                         </div>
+                        ${descripcionHtml}
+                        <button type="button" class="tarjeta-catalogo__accion" data-ver-detalle>${textoAccion}</button>
                     </div>
                 </article>
             `;

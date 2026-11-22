@@ -24,6 +24,9 @@ $base_url = ($pos !== false) ? substr($script_path, 0, $pos) . '/FrontEnd' : '';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@200;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo $base_url; ?>/css/catalogo.css">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>/css/secciones.css">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>/css/botones.css">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>/css/tarjetasCatalogo.css">
 </head>
 <body>
     <div class="menu-btn sidebar-btn" id="sidebar-btn" aria-expanded="false">
@@ -35,7 +38,7 @@ $base_url = ($pos !== false) ? substr($script_path, 0, $pos) . '/FrontEnd' : '';
         <i class="bx bx-sun"></i>
     </div>
     <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar minimize" id="sidebar">
         <div class="menu-btn" id="menu-btn" title="Minimizar o expandir menú" aria-label="Minimizar o expandir menú" role="button" tabindex="0">
             <i class='bx bx-chevron-left' ></i>
         </div>

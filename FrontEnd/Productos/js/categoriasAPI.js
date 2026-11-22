@@ -45,6 +45,7 @@ function initCategorias() {
                 ? item.imagen
                 : "uploads/default/default-image.jpg";
             const cambiarEstadoBtn  = item.activo == 1 ? 'desactivar' : 'activar';
+            const varianteEstadoBtn = cambiarEstadoBtn === 'activar' ? 'btn-ui--success' : 'btn-ui--ghost';
             const textoEstadoVisual = item.activo == 0 ? 'Innactivo' : 'Activo';
 
             html += `
@@ -61,9 +62,9 @@ function initCategorias() {
                         <div class="card-estado ${esactivo}">${textoEstadoVisual}</div>
                     </div>
                     <div class="card-actions">
-                        <button type="button" class="btn btn-edit btn-editar-cat" data-id="${item.id_categoria}">Editar</button>
-                        <div class="btn btn-${cambiarEstadoBtn} btn-${cambiarEstadoBtn}-cat" data-id="${item.id_categoria}">${cambiarEstadoBtn}</div>
-                        <button type="button" class="btn btn-innactivo btn-eliminar-cat" data-id="${item.id_categoria}">Eliminar</button>
+                        <button type="button" class="btn btn-ui btn-ui--tertiary btn-edit btn-editar-cat" data-id="${item.id_categoria}">Editar</button>
+                        <div class="btn btn-ui ${varianteEstadoBtn} btn-${cambiarEstadoBtn} btn-${cambiarEstadoBtn}-cat" data-id="${item.id_categoria}">${cambiarEstadoBtn}</div>
+                        <button type="button" class="btn btn-ui btn-ui--secondary btn-innactivo btn-eliminar-cat" data-id="${item.id_categoria}">Eliminar</button>
                     </div>
                 </div>
             `;

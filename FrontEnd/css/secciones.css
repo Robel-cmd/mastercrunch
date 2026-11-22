@@ -1,0 +1,185 @@
+/* =========================================================
+   Componente de sección (diseño Figma adaptado al panel)
+   Se carga después de los CSS de los módulos para sobrescribir
+   los estilos antiguos de .header-card-container, .search-general,
+   .button-general, etc. sin eliminar sus hojas de estilo.
+   ========================================================= */
+
+.seccion{
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 0.625rem;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.seccion__header{
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.1875rem; /* 35px (Figma) */
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.seccion__icono{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.3125rem; /* 21px */
+    height: 1.3125rem;
+    flex-shrink: 0;
+    color: var(--primary-color);
+}
+.seccion__icono i{
+    font-size: 1.3125rem;
+    line-height: 1;
+}
+
+.seccion__titulo{
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-color);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.75rem; /* 12px */
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+/* Buscador: opcional. Si no existe, el título ocupa el espacio libre. */
+.seccion__search{
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex: 1 1 0;
+    min-width: 11.25rem; /* 180px */
+    height: 2.1875rem;
+    padding: 0 0.625rem;
+    background-color: var(--card-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 1.5rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.seccion__search:focus-within{
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--secondary-color);
+}
+.seccion__search i{
+    font-size: 1.125rem;
+    line-height: 1;
+    color: var(--text-color);
+    opacity: 0.55;
+    flex-shrink: 0;
+}
+.seccion__search input[type="search"]{
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text-color);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.75rem;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.seccion__search input[type="search"]::placeholder{
+    color: var(--text-color);
+    opacity: 0.5;
+}
+
+/* Acción: opcional. Se empuja a la derecha cuando hay buscador. */
+.seccion__accion{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    flex: 0 0 auto;
+    min-height: 2.1875rem;
+    padding: 0 0.875rem;
+    background-color: var(--primary-color-btn);
+    color: var(--btn-color-text);
+    border: 0;
+    border-radius: 1.875rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+.seccion__accion:hover{
+    filter: brightness(1.08);
+}
+.seccion__accion:active{
+    transform: translateY(1px);
+}
+.seccion__accion i{
+    font-size: 1.125rem;
+    line-height: 1;
+}
+
+/* Grupo de acciones (p. ej. los toggles del catálogo) */
+.seccion__acciones{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* Cuerpo: sin altura fija (el Figma usaba 162px de placeholder) */
+.seccion__body{
+    width: 100%;
+    min-height: 0;
+}
+
+/* El header de las columnas de Cocina conserva su separador */
+.cocina-column-header.seccion__header{
+    padding: 0.625rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--card-background-color);
+}
+
+/* Objetivos táctiles cómodos en pantallas táctiles */
+@media (pointer: coarse){
+    .seccion__search,
+    .seccion__accion{
+        min-height: 2.5rem;
+    }
+}
+
+/* Pantallas pequeñas: icono + título arriba, buscador y acción abajo */
+@media (max-width: 768px){
+    .seccion__header{
+        gap: 0.5rem;
+    }
+    .seccion__titulo{
+        flex: 1 1 auto;
+    }
+    .seccion__search{
+        flex: 1 1 100%;
+        order: 2;
+    }
+    .seccion__accion,
+    .seccion__acciones{
+        order: 3;
+    }
+    .seccion__accion{
+        width: 100%;
+    }
+    .seccion__acciones .btn-toggle-icon{
+        flex: 1 1 0;
+    }
+}

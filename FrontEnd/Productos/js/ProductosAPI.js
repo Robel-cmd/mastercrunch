@@ -74,7 +74,7 @@ function initProductos() {
                 <td>${extraIcono}</td>
                 <td>
                     <div class="table-actions">
-                        <div class="btn btn-edit-prod btn-editar"
+                        <div class="btn btn-ui btn-ui--tertiary btn-edit-prod btn-editar"
                              data-id="${item.id_producto}"
                              data-codint="${item.codigo_interno}"
                              data-img="${item.url_imagen || ''}"
@@ -84,7 +84,7 @@ function initProductos() {
                              data-extra="${esExtraBool ? '1' : '0'}">
                              Editar
                         </div>
-                        <div class="btn btn-delete-prod btn-eliminar btn-borrar" data-id="${item.id_producto}">Eliminar</div>
+                        <div class="btn btn-ui btn-ui--secondary btn-delete-prod btn-eliminar btn-borrar" data-id="${item.id_producto}">Eliminar</div>
                     </div>
                 </td>
             `;

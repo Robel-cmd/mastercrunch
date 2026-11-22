@@ -83,6 +83,7 @@ function initCombo() {
             const esActivo          = item.activo == 0 ? 'innactivo' : 'activo';
             const claseActivo       = item.activo == 0 ? 'inactivo' : 'activo';
             const cambiarEstadoBtn  = item.activo == 1 ? 'desactivar' : 'activar';
+            const varianteEstadoBtn = cambiarEstadoBtn === 'activar' ? 'btn-ui--success' : 'btn-ui--ghost';
             const textoEstadoVisual = item.activo == 0 ? 'Innactivo' : 'Activo';
 
             let detallesContent = "";
@@ -117,9 +118,9 @@ function initCombo() {
                         <div class="card-estado ${claseActivo}">${textoEstadoVisual}</div>
                     </div>
                     <div class="card-actions">
-                        <div class="btn btn-edit button-editar btn-combo-edit" data-id="${item.id_combo}" id="editar-combo">Editar</div>
-                        <div class="btn btn-${cambiarEstadoBtn} btn-${cambiarEstadoBtn}-combo" data-id="${item.id_combo}">${cambiarEstadoBtn}</div>
-                        <div class="btn btn-borrar-Combo" data-id="${item.id_combo}">Eliminar</div>
+                        <div class="btn btn-ui btn-ui--tertiary btn-edit button-editar btn-combo-edit" data-id="${item.id_combo}" id="editar-combo">Editar</div>
+                        <div class="btn btn-ui ${varianteEstadoBtn} btn-${cambiarEstadoBtn} btn-${cambiarEstadoBtn}-combo" data-id="${item.id_combo}">${cambiarEstadoBtn}</div>
+                        <div class="btn btn-ui btn-ui--secondary btn-borrar-Combo" data-id="${item.id_combo}">Eliminar</div>
                     </div>
                 </div>
             `;
@@ -410,7 +411,7 @@ function initCombo() {
                                 <td>${cantidad}</td>
                                 <td>${precioInd.toFixed(2)}</td>
                                 <td>${totalFila.toFixed(2)}</td>
-                                <td><button type="button" class="btn btn-cancelar-fila-edit" data-total="${totalFila.toFixed(2)}">Cancelar</button></td>
+                                <td><button type="button" class="btn btn-ui btn-ui--secondary btn-cancelar-fila-edit" data-total="${totalFila.toFixed(2)}">Cancelar</button></td>
                             </tr>
                         `;
                         bodyContent.insertAdjacentHTML('beforeend', contentList);
@@ -591,7 +592,7 @@ function initCombo() {
                             <td>${cantidad}</td>
                             <td>${precioNum.toFixed(2)}</td>
                             <td>${total.toFixed(2)}</td>
-                            <td><button type="button" class="btn btn-cancelar-fila" data-total="${total.toFixed(2)}">Cancelar</button></td>
+                            <td><button type="button" class="btn btn-ui btn-ui--secondary btn-cancelar-fila" data-total="${total.toFixed(2)}">Cancelar</button></td>
                         </tr>
                     `;
                     bodyContent.innerHTML += contentList;
@@ -775,7 +776,7 @@ function initCombo() {
                         <td>${cantidad}</td>
                         <td>${precioNum.toFixed(2)}</td>
                         <td>${totalFila.toFixed(2)}</td>
-                        <td><button type="button" class="btn btn-cancelar-fila-edit" data-total="${totalFila.toFixed(2)}">Cancelar</button></td>
+                        <td><button type="button" class="btn btn-ui btn-ui--secondary btn-cancelar-fila-edit" data-total="${totalFila.toFixed(2)}">Cancelar</button></td>
                     </tr>
                 `;
                 bodyContent.insertAdjacentHTML('beforeend', contentList);
