@@ -25,6 +25,19 @@ const sidebarBtn         = document.getElementById('sidebar-btn');
 const darkModeBtn        = document.getElementById('dark-mode-btn');
 const allMenuItems       = document.querySelectorAll('.menu-item');
 
+/* --- Avatar: fallback con iniciales si la imagen no carga --- */
+const avatarImg = document.querySelector('.user-img img');
+const avatarBox = document.querySelector('.user-img');
+
+if (avatarImg && avatarBox) {
+    const showAvatarFallback = () => avatarBox.classList.add('avatar-error');
+
+    avatarImg.addEventListener('error', showAvatarFallback);
+    if (avatarImg.complete && avatarImg.naturalWidth === 0) {
+        showAvatarFallback();
+    }
+}
+
 /* --- Marcar item activo--- */
 allMenuItems.forEach(menuItem => {
     menuItem.addEventListener('click', () => {
@@ -45,29 +58,49 @@ if (darkModeBtn) {
     });
 }
 
-/* --- Sidebar toggle--- */
+/* --- Overlay del sidebar en pantallas pequeñas --- */
+const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+function setSidebarOpen(open) {
+    document.body.classList.toggle('sidebar-hidden', open);
+    if (sidebarBtn) sidebarBtn.setAttribute('aria-expanded', String(open));
+}
+
 if (sidebarBtn) {
     sidebarBtn.addEventListener('click', () => {
-        document.body.classList.toggle('sidebar-hidden');
+        setSidebarOpen(!document.body.classList.contains('sidebar-hidden'));
+    });
+
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', () => setSidebarOpen(false));
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && document.body.classList.contains('sidebar-hidden')) {
+            setSidebarOpen(false);
+            sidebarBtn.focus();
+        }
     });
 }
 
-/* --- Minimizar sidebar-- */
+document.querySelectorAll('.sidebar .menu-link').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 900 || window.innerHeight <= 683) {
+            setSidebarOpen(false);
+        }
+    });
+});
+
+/* --- Minimizar sidebar (control explícito) --- */
 if (menuBtn && sidebar) {
-    menuBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('minimize');
-    });
-}
+    const toggleSidebar = () => sidebar.classList.toggle('minimize');
 
-/* --- Auto expandir al pasar el mouse--- */
-if (sidebar) {
-    sidebar.addEventListener('mouseenter', () => {
-        if (window.innerWidth <= 700) return;
-        sidebar.classList.remove('minimize');
-    });
-    sidebar.addEventListener('mouseleave', () => {
-        if (window.innerWidth <= 700) return;
-        sidebar.classList.add('minimize');
+    menuBtn.addEventListener('click', toggleSidebar);
+    menuBtn.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggleSidebar();
+        }
     });
 }
 
@@ -129,10 +162,15 @@ menusItemsStatic.forEach(menuItem => {
     });
 });
 
-/* ---expandir sidebar en pantallas chicas --- */
+/* --- Expandir sidebar y cerrar overlay según el viewport --- */
 function checkWindowsSize() {
-    if (sidebar && window.innerWidth <= 700) {
+    const isSmall = window.innerWidth <= 900 || window.innerHeight <= 683;
+
+    if (sidebar && isSmall) {
         sidebar.classList.remove('minimize');
+    }
+    if (!isSmall) {
+        setSidebarOpen(false);
     }
 }
 checkWindowsSize();

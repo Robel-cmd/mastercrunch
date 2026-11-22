@@ -758,7 +758,7 @@
 }
 .sidebar.minimize + main,
 .sidebar.minimize ~ #content-main {
-    --sidebar-width: 4.94rem;
+    --sidebar-width: 4.5rem;
 }
 
 /* Contenedor fijo abajo-izquierda */
