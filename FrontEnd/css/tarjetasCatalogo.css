@@ -318,6 +318,13 @@ body.dark-mode .producto-card.tarjeta-catalogo.tarjeta-catalogo--extra{
     font-size: 0.8125rem;
 }
 
+.modal-detalle-catalogo .contenido-botones-modal{
+    display: flex;
+    gap: 0.75rem;
+}
+
 .modal-detalle-catalogo .contenido-botones-modal .btn-ui{
-    width: 100%;
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
 }

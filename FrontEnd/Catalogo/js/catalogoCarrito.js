@@ -115,6 +115,9 @@ function abrirDetalleCatalogo(item, tipo) {
         }
     }
 
+    modal.dataset.itemDetalle = JSON.stringify(item);
+    modal.dataset.tipoDetalle = tipo;
+
     if (!modal.open) modal.showModal();
 }
 
@@ -210,7 +213,7 @@ function initCarrito() {
 }
 
 function initCatalogoItems() {
-    // Clicks en el catálogo: abre el detalle del item (informativo)
+    // Clicks en el catálogo: botón abre detalle; el resto de la tarjeta agrega
     const grid = document.getElementById('catalogo-container');
     if (!grid || grid.dataset.bindItems) {
         if (grid) grid.dataset.bindItems = '1';
@@ -233,7 +236,11 @@ function initCatalogoItems() {
                 ? 'extra'
                 : 'producto';
 
-        abrirDetalleCatalogo(item, tipo);
+        if (e.target.closest('[data-ver-detalle]')) {
+            abrirDetalleCatalogo(item, tipo);
+        } else {
+            agregarAlCarrito(item, tipo);
+        }
     });
 }
 
@@ -246,8 +253,25 @@ function initDetalleCatalogo() {
 
     const btnCerrar = document.getElementById('btn-close-detalle-catalogo');
     const btnCerrarFooter = document.getElementById('btn-cerrar-detalle-catalogo');
+    const btnAgregar = document.getElementById('btn-agregar-detalle-catalogo');
+
     if (btnCerrar) btnCerrar.addEventListener('click', cerrar);
     if (btnCerrarFooter) btnCerrarFooter.addEventListener('click', cerrar);
+
+    if (btnAgregar) {
+        btnAgregar.addEventListener('click', () => {
+            let item = null;
+            try {
+                item = JSON.parse(modal.dataset.itemDetalle || '{}');
+            } catch (_) {
+                item = null;
+            }
+
+            const tipo = modal.dataset.tipoDetalle || 'producto';
+            if (item && item.nombre) agregarAlCarrito(item, tipo);
+            cerrar();
+        });
+    }
 
     // Cerrar al hacer click fuera
     modal.addEventListener('click', (e) => {

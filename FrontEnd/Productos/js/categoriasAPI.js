@@ -18,14 +18,16 @@ function initCategorias() {
     const apiURLProductos = `${API_BASE}/meta.php?entity=producto`;
 
 
-    function renderizarCategorias(registros) {
+    function renderizarCategorias(registros, preservarScroll = false) {
         const contenedor = document.querySelector('#contenedor-categorias');
         if (!contenedor) return;
-        contenedor.innerHTML = "";
+
+        const scrollY = window.scrollY;
 
         if (!registros || registros.length === 0) {
             contenedor.innerHTML = `<div style="text-align:center;width:100%;padding:20px;" class="noseencontro">No se encontraron categorías</div>`;
             renderPaginacion(document.getElementById('paginacion-categorias'), 1, 0, CATEGORIAS_POR_PAGINA, () => {});
+            if (preservarScroll) window.scrollTo(0, scrollY);
             return;
         }
 
@@ -78,6 +80,8 @@ function initCategorias() {
             porPagina,
             (p) => { _paginaCatActual = p; renderizarCategorias(_categoriasMostradas); }
         );
+
+        if (preservarScroll) window.scrollTo(0, scrollY);
     }
 
     window.addEventListener('resize', () => {
@@ -100,7 +104,7 @@ function initCategorias() {
     }
 
 
-    async function CargarAPICategoria() {
+    async function CargarAPICategoria(preservarScroll = false) {
         const urlConInactivas = `${apiURL}&incluirInactivas=true`;
         try {
             const res = await fetch(urlConInactivas);
@@ -110,12 +114,12 @@ function initCategorias() {
             const categorias = Array.isArray(data) ? data : (data.registros || []);
             listaCategoriasGlobal = categorias;
 
-            renderizarCategorias(listaCategoriasGlobal);
+            renderizarCategorias(listaCategoriasGlobal, preservarScroll);
             renderizarSelectsCategorias(listaCategoriasGlobal);
         } catch (error) {
             console.error('error', error);
             listaCategoriasGlobal = [];
-            renderizarCategorias([]);
+            renderizarCategorias([], preservarScroll);
         }
     }
     CargarAPICategoria();
@@ -455,5 +459,5 @@ function initCategorias() {
     }
 
 
-    window.registerPoll(CargarAPICategoria, 5000);
+    window.registerPoll(() => CargarAPICategoria(true), 5000);
 }

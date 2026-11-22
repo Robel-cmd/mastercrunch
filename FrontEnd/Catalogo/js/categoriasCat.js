@@ -9,11 +9,11 @@ function initCategoriasCatalogo() {
     const ANCHO_TARJETA_CAT = 280;   // 260px tarjeta + gap
 
     //tarjetas de categorías
-    function renderizarCategorias(registros) {
+    function renderizarCategorias(registros, preservarScroll = false) {
         const categoriasContainer = document.getElementById('categorias-container');
         if (!categoriasContainer) return;
 
-        categoriasContainer.innerHTML = '';
+        const scrollY = window.scrollY;
 
         // Estado vacío
         if (!registros || registros.length === 0) {
@@ -23,6 +23,7 @@ function initCategoriasCatalogo() {
                 </div>
             `;
             renderPaginacion(document.getElementById('paginacion-catalogo-categorias'), 1, 0, CATEGORIAS_POR_PAGINA, () => {});
+            if (preservarScroll) window.scrollTo(0, scrollY);
             return;
         }
 
@@ -64,6 +65,8 @@ function initCategoriasCatalogo() {
             porPagina,
             (p) => { _paginaCatActual = p; renderizarCategorias(_categoriasMostradas); }
         );
+
+        if (preservarScroll) window.scrollTo(0, scrollY);
     }
 
     // Al cambiar el tamaño de pantalla, recalcular cuántos ítems caben
@@ -72,25 +75,25 @@ function initCategoriasCatalogo() {
     });
 
     // Cargar categorías (el filtro de texto se aplica en el render)
-    function fetchCategorias() {
+    function fetchCategorias(preservarScroll = false) {
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 const registros = Array.isArray(data) ? data : (data.registros || []);
                 _todasLasCategorias = registros;
-                renderConFiltroTexto();
+                renderConFiltroTexto(preservarScroll);
             })
             .catch(error => {
                 console.error('Error al obtener las categorías:', error);
                 _todasLasCategorias = [];
-                renderizarCategorias([]);
+                renderizarCategorias([], preservarScroll);
             });
     }
 
     let _todasLasCategorias = [];
 
     // Aplica el texto del buscador global al carrusel de categorías
-    function renderConFiltroTexto() {
+    function renderConFiltroTexto(preservarScroll = false) {
         const texto = ((window._catalogoFiltros && window._catalogoFiltros.texto) || '')
             .trim().toLowerCase();
         const filtradas = !texto
@@ -99,7 +102,7 @@ function initCategoriasCatalogo() {
                 String(c.nombre || '').toLowerCase().includes(texto) ||
                 String(c.descripcion || '').toLowerCase().includes(texto)
               );
-        renderizarCategorias(filtradas);
+        renderizarCategorias(filtradas, preservarScroll);
 
         // Mantener la categoría activa visualmente tras un re-render
         const activa = window._catalogoFiltros && window._catalogoFiltros.categoria;
@@ -109,8 +112,8 @@ function initCategoriasCatalogo() {
         }
     }
 
-    window.addEventListener('catalogo:texto', renderConFiltroTexto);
+    window.addEventListener('catalogo:texto', () => renderConFiltroTexto(false));
 
     fetchCategorias();
-    window.registerPoll(fetchCategorias, 5000);
+    window.registerPoll(() => fetchCategorias(true), 5000);
 }

@@ -9,11 +9,11 @@ function initCatalogoAPI() {
     const PRODUCTOS_POR_PAGINA = 10;
 
     //tarjetas de productos en el catálogo
-    function renderizarCatalogo(registros) {
+    function renderizarCatalogo(registros, preservarScroll = false) {
         const catalogoContainer = document.getElementById('catalogo-container');
         if (!catalogoContainer) return;
 
-        catalogoContainer.innerHTML = '';
+        const scrollY = window.scrollY;
 
         // Estado vacío
         if (!registros || registros.length === 0) {
@@ -23,6 +23,7 @@ function initCatalogoAPI() {
                 </div>
             `;
             renderPaginacion(document.getElementById('paginacion-catalogo-productos'), 1, 0, PRODUCTOS_POR_PAGINA, () => {});
+            if (preservarScroll) window.scrollTo(0, scrollY);
             return;
         }
 
@@ -87,6 +88,8 @@ function initCatalogoAPI() {
             PRODUCTOS_POR_PAGINA,
             (p) => { _paginaProdActual = p; renderizarCatalogo(_productosMostrados); }
         );
+
+        if (preservarScroll) window.scrollTo(0, scrollY);
     }
 
     // Normaliza un combo al mismo formato que un producto del catálogo
@@ -150,7 +153,7 @@ function initCatalogoAPI() {
     // resetPagina=false cuando solo se refresca el polling (mantiene la p. actual)
     function aplicarFiltro(resetPagina = true) {
         if (resetPagina) _paginaProdActual = 1;
-        renderizarCatalogo(itemsFiltrados());
+        renderizarCatalogo(itemsFiltrados(), !resetPagina);
     }
 
     // Cargar catálogo: productos + combos (NO reinicia la pág. al refrescar el poll)

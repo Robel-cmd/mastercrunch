@@ -58,13 +58,15 @@ function initCombo() {
         return detalles;
     }
 
-    function renderizarCombos(registros) {
+    function renderizarCombos(registros, preservarScroll = false) {
         if (!contenedor) return;
-        contenedor.innerHTML = "";
+
+        const scrollY = window.scrollY;
 
         if (!registros || registros.length === 0) {
             contenedor.innerHTML = `<p class="no-results" style="padding:20px; text-align:center; width:100%;">No se encontraron combos.</p>`;
             renderPaginacion(document.getElementById('paginacion-combos'), 1, 0, COMBOS_POR_PAGINA, () => {});
+            if (preservarScroll) window.scrollTo(0, scrollY);
             return;
         }
 
@@ -135,13 +137,15 @@ function initCombo() {
             porPagina,
             (p) => { _paginaComboActual = p; renderizarCombos(_combosMostrados); }
         );
+
+        if (preservarScroll) window.scrollTo(0, scrollY);
     }
 
     window.addEventListener('resize', () => {
         if (_combosMostrados.length > 0) renderizarCombos(_combosMostrados);
     });
 
-    async function cargarAPICombo() {
+    async function cargarAPICombo(preservarScroll = false) {
         const apiMeta = `${API_BASE}/meta.php?entity=combo`;
 
         try {
@@ -149,7 +153,7 @@ function initCombo() {
 
             if (response.status === 404) {
                 _comboState.todosLosCombos = [];
-                renderizarCombos([]);
+                renderizarCombos([], preservarScroll);
                 return;
             }
 
@@ -157,12 +161,12 @@ function initCombo() {
 
             const data = await response.json();
             _comboState.todosLosCombos = data.registros || data || [];
-            renderizarCombos(_comboState.todosLosCombos);
+            renderizarCombos(_comboState.todosLosCombos, preservarScroll);
 
         } catch (error) {
             console.error('Error al cargar los datos:', error);
             _comboState.todosLosCombos = [];
-            renderizarCombos([]);
+            renderizarCombos([], preservarScroll);
         }
     }
 
@@ -858,7 +862,7 @@ function initCombo() {
                 mostrarNotificacion("Error de conexión con el servidor", "error");
             }
         });
-        window.registerPoll(cargarAPICombo, 5000);
+        window.registerPoll(() => cargarAPICombo(true), 5000);
     }
 
     cargarAPICombo();

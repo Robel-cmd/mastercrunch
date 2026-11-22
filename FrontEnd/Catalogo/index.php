@@ -166,6 +166,7 @@
         </section>
         <div class="contenido-botones-modal">
             <button class="emergente-btn btn-ui btn-ui--secondary btn-ui--lg" id="btn-cerrar-detalle-catalogo">Cerrar</button>
+            <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="btn-agregar-detalle-catalogo">Agregar</button>
         </div>
     </section>
 </dialog>

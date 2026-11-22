@@ -30,14 +30,16 @@ function initProductos() {
         combo: apirurlCombos
     };
 
-    function renderizarTabla(registros) {
+    function renderizarTabla(registros, preservarScroll = false) {
         const contenedorTabla = document.querySelector('#table-content tbody');
         if (!contenedorTabla) return;
-        contenedorTabla.innerHTML = "";
+
+        const scrollY = window.scrollY;
 
         if (!registros || registros.length === 0) {
             contenedorTabla.innerHTML = `<tr><td colspan="8" style="text-align:center;">No se encontraron productos</td></tr>`;
             renderPaginacion(document.getElementById('paginacion-productos'), 1, 0, PRODUCTOS_POR_PAGINA, () => {});
+            if (preservarScroll) window.scrollTo(0, scrollY);
             return;
         }
 
@@ -50,6 +52,8 @@ function initProductos() {
         const visibles = registros.slice(inicio, inicio + PRODUCTOS_POR_PAGINA);
 
         registros = visibles;
+        const fragmento = document.createDocumentFragment();
+
         registros.forEach(item => {
             const disponibilidad  = item.disponibilidad == 0 ? 'Agotado' : 'Disponible';
             const esExtraBool     = String(item.es_extra) === "1";
@@ -88,8 +92,10 @@ function initProductos() {
                     </div>
                 </td>
             `;
-            contenedorTabla.appendChild(fila);
+            fragmento.appendChild(fila);
         });
+
+        contenedorTabla.replaceChildren(fragmento);
 
         renderPaginacion(
             document.getElementById('paginacion-productos'),
@@ -98,9 +104,11 @@ function initProductos() {
             PRODUCTOS_POR_PAGINA,
             (p) => { _paginaProdActual = p; renderizarTabla(_prodState.listaMostrada); }
         );
+
+        if (preservarScroll) window.scrollTo(0, scrollY);
     }
 
-    async function cargarAPIProducto() {
+    async function cargarAPIProducto(preservarScroll = false) {
         try {
             const [resCat, resProd] = await Promise.all([
                 fetch(apirurlCat),
@@ -152,12 +160,12 @@ function initProductos() {
             });
 
             _prodState.listaProductos = prodsArray;
-            renderizarTabla(_prodState.listaProductos);
+            renderizarTabla(_prodState.listaProductos, preservarScroll);
 
         } catch (error) {
             console.error('Error al cargar los datos:', error);
             _prodState.listaProductos = [];
-            renderizarTabla([]);
+            renderizarTabla([], preservarScroll);
         }
     }
 
@@ -506,5 +514,5 @@ function initProductos() {
             renderizarTabla(filtrados);
         });
     }
-    window.registerPoll(cargarAPIProducto, 5000);
+    window.registerPoll(() => cargarAPIProducto(true), 5000);
 }
