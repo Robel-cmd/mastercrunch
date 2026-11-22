@@ -149,7 +149,7 @@ function initCombo() {
         const apiMeta = `${API_BASE}/meta.php?entity=combo`;
 
         try {
-            const response = await fetch(apiMeta);
+            const response = await fetch(apiMeta, { cache: 'no-store' });
 
             if (response.status === 404) {
                 _comboState.todosLosCombos = [];
@@ -173,6 +173,7 @@ function initCombo() {
     // Guardar refs para listeners persistentes
     _comboState.cargarAPI = cargarAPICombo;
     _comboState.render    = renderizarCombos;
+    window.refrescarCombos = cargarAPICombo;
 
     /*FILTROS DE BÚSQUEDA*/
     if (inputSearch) {
@@ -222,7 +223,7 @@ function initCombo() {
 
         async function cargarProductosParaModal() {
             try {
-                const response = await fetch(apirurlProductos);
+                const response = await fetch(apirurlProductos, { cache: 'no-store' });
                 const data = await response.json();
                 productosOriginales = data.registros || data || [];
                 actualizarSelect(productosOriginales);
@@ -243,6 +244,7 @@ function initCombo() {
         }
 
         cargarProductosParaModal();
+        window.recargarProductosCombo = cargarProductosParaModal;
     }
 
     /*FILTRO MODAL EDITAR*/
@@ -280,7 +282,7 @@ function initCombo() {
 
         async function cargarProductosParaModalEdit() {
             try {
-                const response = await fetch(apirurlProductos);
+                const response = await fetch(apirurlProductos, { cache: 'no-store' });
                 const data = await response.json();
                 productosOriginalesEdit = data.registros || data || [];
                 actualizarSelectEdit(productosOriginalesEdit);
@@ -301,6 +303,7 @@ function initCombo() {
         }
 
         cargarProductosParaModalEdit();
+        window.recargarProductosComboEdit = cargarProductosParaModalEdit;
     }
 
     /* LIMPIAR MODALES*/
@@ -357,6 +360,18 @@ function initCombo() {
     if (!_comboDocReady) {
         _comboDocReady = true;
 
+        /* --- Refrescar el desplegable de productos al abrir un modal de combo --- */
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#agregar-combos') &&
+                typeof window.recargarProductosCombo === 'function') {
+                window.recargarProductosCombo();
+            }
+            if (e.target.closest('.btn-combo-edit') &&
+                typeof window.recargarProductosComboEdit === 'function') {
+                window.recargarProductosComboEdit();
+            }
+        });
+
         /* --- Abrir modal editar combo --- */
         document.addEventListener('click', async (e) => {
             const btnEditarCombo = e.target.closest('.btn-combo-edit');
@@ -374,7 +389,7 @@ function initCombo() {
 
             const apiComboId = `${_comboState.apiUrls.combo}&id=${idCombo}`;
             try {
-                const res  = await fetch(apiComboId);
+                const res  = await fetch(apiComboId, { cache: 'no-store' });
                 const data = await res.json();
 
                 const inputNombre = document.getElementById('nombreCombo-edit');
@@ -395,7 +410,7 @@ function initCombo() {
                         let nombreProd = item.producto_nombre || "Producto";
                         if (!item.producto_nombre) {
                             try {
-                                const resProd  = await fetch(`${_comboState.apiUrls.prod}&id=${item.id_producto}`);
+                                const resProd  = await fetch(`${_comboState.apiUrls.prod}&id=${item.id_producto}`, { cache: 'no-store' });
                                 const prodData = await resProd.json();
                                 if (prodData.nombre) nombreProd = prodData.nombre;
                             } catch (err) { console.error(err); }
@@ -473,7 +488,7 @@ function initCombo() {
             .then(res => res.json().then(d => ({ ok: res.ok, data: d })))
             .then(({ ok, data }) => {
                 if (ok) {
-                    if (_comboState.cargarAPI) _comboState.cargarAPI();
+                    window.refrescarListasProductos();
                     mostrarNotificacion("¡Se ha modificado el combo con éxito!", "success");
                 } else {
                     mostrarNotificacion(data.message || "No se pudo modificar el combo", "error");
@@ -530,7 +545,7 @@ function initCombo() {
 
                 if (res.ok) {
                     mostrarNotificacion(data.message || "Combo eliminado exitosamente", "success");
-                    if (_comboState.cargarAPI) _comboState.cargarAPI();
+                    window.refrescarListasProductos();
                 } else {
                     mostrarNotificacion(data.message || "No se pudo eliminar el combo", "error");
                 }
@@ -562,7 +577,7 @@ function initCombo() {
             if (!inputSelectProd) { mostrarNotificacion("Selecciona un producto válido", "error"); return; }
             if (!cantidad || cantidad <= 0) { mostrarNotificacion("Ingresa una cantidad válida", "error"); return; }
 
-            fetch(`${apirurlProductos}&id=${inputSelectProd}`)
+            fetch(`${apirurlProductos}&id=${inputSelectProd}`, { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.nombre === undefined) {
@@ -690,9 +705,10 @@ function initCombo() {
                 const res = await fetch(apirurlCombos, { method: 'POST', body: formData });
                 const resultado = await res.json();
                 if (res.ok) {
+                    _paginaComboActual = 1;
                     mostrarNotificacion(resultado.message, "success");
                     limpiarModalCombo();
-                    cargarAPICombo();
+                    window.refrescarListasProductos();
                 } else {
                     mostrarNotificacion(resultado.message, "error");
                 }
@@ -751,7 +767,7 @@ function initCombo() {
             if (!cantidad || cantidad <= 0) { mostrarNotificacion("Ingresa una cantidad válida", "error"); return; }
 
             try {
-                const res  = await fetch(`${apirurlProductos}&id=${inputSelectProd}`);
+                const res  = await fetch(`${apirurlProductos}&id=${inputSelectProd}`, { cache: 'no-store' });
                 const data = await res.json();
                 if (!data || !data.nombre) {
                     mostrarNotificacion("Producto no encontrado", "error");
@@ -853,7 +869,7 @@ function initCombo() {
                 if (res.ok) {
                     mostrarNotificacion(resultado.message || "Combo actualizado con éxito", "success");
                     limpiarModalComboEdit();
-                    cargarAPICombo();
+                    window.refrescarListasProductos();
                 } else {
                     mostrarNotificacion(resultado.message || "Error al actualizar el combo", "error");
                 }
@@ -862,7 +878,7 @@ function initCombo() {
                 mostrarNotificacion("Error de conexión con el servidor", "error");
             }
         });
-        window.registerPoll(() => cargarAPICombo(true), 5000);
+        window.registerPoll(() => cargarAPICombo(true), 5000, { ignoreModals: true });
     }
 
     cargarAPICombo();

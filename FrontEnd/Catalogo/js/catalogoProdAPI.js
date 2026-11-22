@@ -116,7 +116,8 @@ function initCatalogoAPI() {
     let _todosLosItems = [];
 
     // Estado compartido de filtros (lo usa también el módulo de categorías)
-    if (!window._catalogoFiltros) window._catalogoFiltros = { texto: '', categoria: null };
+    if (!window._catalogoFiltros) window._catalogoFiltros = { texto: '', categorias: [] };
+    if (!Array.isArray(window._catalogoFiltros.categorias)) window._catalogoFiltros.categorias = [];
 
     // Devuelve los items según el chip activo, la categoría seleccionada y el texto
     function itemsFiltrados() {
@@ -131,10 +132,18 @@ function initCatalogoAPI() {
             items = items.filter(i => !i.esCombo && String(i.es_extra) !== '1');
         }
 
-        const cat = window._catalogoFiltros.categoria;
-        if (cat) {
-            const catNorm = String(cat).trim().toLowerCase();
-            items = items.filter(i => String(i.categoria_nombre || '').trim().toLowerCase() === catNorm);
+        const cats = window._catalogoFiltros.categorias || [];
+        if (cats.length > 0) {
+            const catNorms = cats.map(c => String(c).trim().toLowerCase());
+            items = items.filter(i => {
+                const nombreCategoria = String(i.categoria_nombre || '').trim().toLowerCase();
+
+                // Los combos no tienen categoría propia: siguen disponibles
+                // mientras el chip esté en "Todos" o "Combos".
+                if (i.esCombo && (filtro === 'todos' || filtro === 'combos')) return true;
+
+                return catNorms.includes(nombreCategoria);
+            });
         }
 
         const texto = (window._catalogoFiltros.texto || '').trim().toLowerCase();
@@ -190,18 +199,6 @@ function initCatalogoAPI() {
             if (window.renderCatalogoConFiltros) window.renderCatalogoConFiltros(true);
         });
 
-        // Selección de categoría (click en tarjeta del carrusel)
-        document.addEventListener('click', (e) => {
-            const carta = e.target.closest('.categoria-card-catalogo');
-            if (!carta) return;
-            const nombre = carta.dataset.nombre;
-            const misma = window._catalogoFiltros && window._catalogoFiltros.categoria === nombre;
-            window._catalogoFiltros = window._catalogoFiltros || { texto: '', categoria: null };
-            window._catalogoFiltros.categoria = misma ? null : nombre;
-            document.querySelectorAll('.categoria-card-catalogo').forEach(c =>
-                c.classList.toggle('selected', !misma && c === carta));
-            if (window.renderCatalogoConFiltros) window.renderCatalogoConFiltros(true);
-        });
     }
 
     // Buscador global
@@ -209,7 +206,7 @@ function initCatalogoAPI() {
     if (buscador && !buscador.dataset.bindBuscador) {
         buscador.dataset.bindBuscador = '1';
         buscador.addEventListener('input', () => {
-            window._catalogoFiltros = window._catalogoFiltros || { texto: '', categoria: null };
+            window._catalogoFiltros = window._catalogoFiltros || { texto: '', categorias: [] };
             window._catalogoFiltros.texto = buscador.value;
             if (window.renderCatalogoConFiltros) window.renderCatalogoConFiltros(true);
             window.dispatchEvent(new CustomEvent('catalogo:texto', { detail: buscador.value }));

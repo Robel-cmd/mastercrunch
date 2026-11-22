@@ -92,6 +92,10 @@ function initCategorias() {
         const selectAdd  = document.querySelector('#content-categorias-list');
         const selectEdit = document.querySelector('#content-categorias-list-edit');
 
+        // No perder la opción elegida si el poll corre con un modal abierto
+        const seleccionAdd  = selectAdd  ? selectAdd.value  : null;
+        const seleccionEdit = selectEdit ? selectEdit.value : null;
+
         if (selectAdd)  selectAdd.innerHTML  = "";
         if (selectEdit) selectEdit.innerHTML = "";
 
@@ -101,13 +105,16 @@ function initCategorias() {
             if (selectAdd)  selectAdd.innerHTML  += opt;
             if (selectEdit) selectEdit.innerHTML += opt;
         });
+
+        if (seleccionAdd  && selectAdd)  selectAdd.value  = seleccionAdd;
+        if (seleccionEdit && selectEdit) selectEdit.value = seleccionEdit;
     }
 
 
     async function CargarAPICategoria(preservarScroll = false) {
         const urlConInactivas = `${apiURL}&incluirInactivas=true`;
         try {
-            const res = await fetch(urlConInactivas);
+            const res = await fetch(urlConInactivas, { cache: 'no-store' });
             let data = {};
             try { data = await res.json(); } catch (_) { data = {}; }
 
@@ -123,6 +130,7 @@ function initCategorias() {
         }
     }
     CargarAPICategoria();
+    window.refrescarCategorias = CargarAPICategoria;
 
     /*LISTENERS GLOBALES*/
     if (!_categoriasDocListenersReady) {
@@ -151,7 +159,7 @@ function initCategorias() {
             if (btnDesactivar) {
                 const idTemp = btnDesactivar.dataset.id;
                 try {
-                    const res = await fetch(apiURLProductos);
+                    const res = await fetch(apiURLProductos, { cache: 'no-store' });
                     let data = {};
                     try { data = await res.json(); } catch (_) { data = {}; }
                     const productos = Array.isArray(data) ? data : (data.registros || []);
@@ -197,7 +205,7 @@ function initCategorias() {
                 .then(res => res.json().then(d => ({ ok: res.ok, data: d })))
                 .then(({ ok, data }) => {
                     if (ok) {
-                        CargarAPICategoria();
+                        window.refrescarListasProductos();
                         mostrarNotificacion("¡Se ha modificado la categoría con éxito!", "success");
                     } else {
                         mostrarNotificacion(data.message || "No se pudo modificar la categoría", "error");
@@ -254,7 +262,7 @@ function initCategorias() {
             const idTemp = btnEliminarCat.dataset.id;
 
             try {
-                const res = await fetch(apiURLProductos);
+                const res = await fetch(apiURLProductos, { cache: 'no-store' });
                 let data = {};
                 try { data = await res.json(); } catch (_) { data = {}; }
                 const productos = Array.isArray(data) ? data : (data.registros || []);
@@ -289,7 +297,7 @@ function initCategorias() {
                 .then(res => res.json().then(d => ({ ok: res.ok, data: d })))
                 .then(({ ok, data }) => {
                     if (ok) {
-                        CargarAPICategoria();
+                        window.refrescarListasProductos();
                         mostrarNotificacion('¡Se ha eliminado la categoría con éxito!', 'success');
                     } else {
                         mostrarNotificacion(data.message || "No se pudo eliminar la categoría", "error");
@@ -368,8 +376,9 @@ function initCategorias() {
                     document.getElementById('descripcion-categoria').value = '';
                     document.getElementById('url-imagen').value            = '';
 
+                    _paginaCatActual = 1;
                     mostrarNotificacion("¡Se ha agregado la categoría con éxito!", "success");
-                    CargarAPICategoria();
+                    window.refrescarListasProductos();
                 })
                 .catch(error => {
                     console.error(error);
@@ -434,7 +443,7 @@ function initCategorias() {
                     }
                     if (modalEditar.open) modalEditar.close();
                     mostrarNotificacion("¡Se ha modificado la categoría con éxito!", "success");
-                    CargarAPICategoria();
+                    window.refrescarListasProductos();
                 })
                 .catch(error => {
                     console.error(error);
@@ -459,5 +468,5 @@ function initCategorias() {
     }
 
 
-    window.registerPoll(() => CargarAPICategoria(true), 5000);
+    window.registerPoll(() => CargarAPICategoria(true), 5000, { ignoreModals: true });
 }

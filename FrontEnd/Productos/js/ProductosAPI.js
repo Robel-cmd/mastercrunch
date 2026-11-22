@@ -13,6 +13,16 @@ let _prodDocReady = false;
 let _paginaProdActual = 1;
 const PRODUCTOS_POR_PAGINA = 10;
 
+// Refresco centralizado: cualquier alta/edición/borrado debe sincronizar
+// las tres listas y los selects dependientes.
+window.refrescarListasProductos = function () {
+    if (typeof window.refrescarCategorias === 'function') window.refrescarCategorias();
+    if (typeof window.refrescarProductos === 'function') window.refrescarProductos();
+    if (typeof window.refrescarCombos === 'function') window.refrescarCombos();
+    if (typeof window.recargarProductosCombo === 'function') window.recargarProductosCombo();
+    if (typeof window.recargarProductosComboEdit === 'function') window.recargarProductosComboEdit();
+};
+
 function initProductos() {
 
     // Rutas dinámicas
@@ -111,8 +121,8 @@ function initProductos() {
     async function cargarAPIProducto(preservarScroll = false) {
         try {
             const [resCat, resProd] = await Promise.all([
-                fetch(apirurlCat),
-                fetch(apirurlProductos)
+                fetch(apirurlCat, { cache: 'no-store' }),
+                fetch(apirurlProductos, { cache: 'no-store' })
             ]);
 
             let categoriaData = {};
@@ -138,6 +148,10 @@ function initProductos() {
             const selectCategorias     = document.querySelector('#content-categorias-list');
             const selectCategoriasEdit = document.querySelector('#content-categorias-list-edit');
 
+            // Conservar la selección del usuario si el poll cae con un modal abierto
+            const seleccionAdd  = selectCategorias     ? selectCategorias.value     : null;
+            const seleccionEdit = selectCategoriasEdit ? selectCategoriasEdit.value : null;
+
             if (selectCategorias)     selectCategorias.innerHTML     = "";
             if (selectCategoriasEdit) selectCategoriasEdit.innerHTML = "";
 
@@ -159,6 +173,9 @@ function initProductos() {
                 }
             });
 
+            if (seleccionAdd  && selectCategorias)     selectCategorias.value     = seleccionAdd;
+            if (seleccionEdit && selectCategoriasEdit) selectCategoriasEdit.value = seleccionEdit;
+
             _prodState.listaProductos = prodsArray;
             renderizarTabla(_prodState.listaProductos, preservarScroll);
 
@@ -172,6 +189,7 @@ function initProductos() {
     // Guardar referencias para que los listeners persistentes las usen
     _prodState.cargarAPI = cargarAPIProducto;
     _prodState.render    = renderizarTabla;
+    window.refrescarProductos = cargarAPIProducto;
 
     cargarAPIProducto();
 
@@ -203,7 +221,7 @@ function initProductos() {
             if (!idTemporal) return;
 
             try {
-                const res = await fetch(_prodState.apiUrls.combo);
+                const res = await fetch(_prodState.apiUrls.combo, { cache: 'no-store' });
                 let data = {};
                 try { data = await res.json(); } catch (_) { data = {}; }
                 const combos = Array.isArray(data) ? data : (data.registros || []);
@@ -246,7 +264,7 @@ function initProductos() {
             .then(({ ok, data }) => {
                 if (ok) {
                     mostrarNotificacion('¡Se ha eliminado el producto con éxito!', 'success');
-                    if (_prodState.cargarAPI) _prodState.cargarAPI();
+                    window.refrescarListasProductos();
                 } else {
                     mostrarNotificacion(data.message || "No se pudo eliminar el producto", "error");
                 }
@@ -369,10 +387,16 @@ function initProductos() {
             formData.append('disponibilidad', disponibilidad);
 
             fetch(apirurlProductos, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(() => {
+                .then(res => res.json().then(data => ({ ok: res.ok, data })))
+                .then(({ ok, data }) => {
+                    if (!ok) {
+                        mostrarNotificacion(data.message || "No se pudo agregar el producto", "error");
+                        return;
+                    }
+
+                    _paginaProdActual = 1;
                     if (modalP) modalP.close();
-                    cargarAPIProducto();
+                    window.refrescarListasProductos();
                     mostrarNotificacion("¡Se han agregado los datos de forma exitosa!", "success");
 
                     inputCodigo.value    = "";
@@ -486,7 +510,7 @@ function initProductos() {
 
                 mostrarNotificacion('¡Se ha actualizado el producto con éxito!', 'success');
                 if (modalEditProd) modalEditProd.close();
-                cargarAPIProducto();
+                window.refrescarListasProductos();
             } catch (error) {
                 mostrarNotificacion("Error al intentar actualizar el producto", "error");
                 console.error("Detalle técnico:", error);
@@ -514,5 +538,5 @@ function initProductos() {
             renderizarTabla(filtrados);
         });
     }
-    window.registerPoll(() => cargarAPIProducto(true), 5000);
+    window.registerPoll(() => cargarAPIProducto(true), 5000, { ignoreModals: true });
 }

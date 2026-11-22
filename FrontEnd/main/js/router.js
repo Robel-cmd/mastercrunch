@@ -41,7 +41,6 @@ function ajax(url) {
                 initCategoriasCatalogo();
                 initCatalogoAPI();
                 initTooglePanel();
-                initToggleBuscador();
                 if (typeof initCarrito === 'function') initCarrito();
                 if (typeof initCatalogoItems === 'function') initCatalogoItems();
                 if (typeof initDetalleCatalogo === 'function') initDetalleCatalogo();

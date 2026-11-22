@@ -194,13 +194,14 @@ window._pollingTimers = [];
  * @returns {number}     - ID del intervalo
  */
 
-window.registerPoll = function (fn, ms = 5000) {
+window.registerPoll = function (fn, ms = 5000, opts = {}) {
     const id = setInterval(() => {
         // Saltar si la pestaña está oculta (no malgastar recursos)
         if (document.hidden) return;
 
-        // Saltar si hay un modal abierto (no interrumpir al usuario)
-        if (document.querySelector('dialog[open]')) return;
+        // Saltar si hay un modal abierto (no interrumpir al usuario),
+        // salvo que el poll lo desactive explícitamente
+        if (!opts.ignoreModals && document.querySelector('dialog[open]')) return;
 
         // Ejecutar con try/catch por si el endpoint falla
         try {

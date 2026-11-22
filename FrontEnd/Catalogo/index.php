@@ -3,56 +3,48 @@
     <h4>Realice ventas, pedidos.</h4>
 </header>
 
-<!--BARRA DE BÚSQUEDA GLOBAL-->
-<section class="container-secondary seccion seccion-categorias-sticky">
-    <div class="seccion__header categorias-header">
-        <div class="seccion__icono"><i class='bx bx-category-alt'></i></div>
-        <span class="seccion__titulo">Listado de categorías</span>
-
-        <div class="seccion__acciones header-actions-group">
-            <!-- Toggle del buscador -->
-            <button type="button" class="btn-toggle-icon" id="btn-toggle-search" aria-expanded="true" title="Buscar">
-                <i class='bx bx-search'></i>
-                <i class='bx bx-chevron-down toggle-arrow'></i>
-            </button>
-
-            <!-- Toggle de categorías -->
-            <button type="button" class="btn-toggle-icon" id="btn-toggle-cats" aria-expanded="true" title="Categorías">
-                <i class='bx bx-category'></i>
-                <i class='bx bx-chevron-down toggle-arrow'></i>
-            </button>
-        </div>
-    </div>
-
-    <div class="seccion__body">
-        <!-- Bloque colapsable: buscador global -->
-        <div class="search-bar-collapsible open" id="search-bar-collapsible">
-            <div class="seccion__search search-general">
-                <i class='bx bx-search-alt-2'></i>
-                <input type="search" placeholder="Buscar en categorías, catálogo y tabla..." id="buscador-global">
-            </div>
-        </div>
-
-        <!-- Bloque colapsable: carrusel de categorías -->
-        <div class="cats-collapsible open" id="cats-collapsible">
-            <div class="cats-collapsible-inner">
-                <div class="carrusel-categorias" id="categorias-container"></div>
-                <div class="paginacion" id="paginacion-catalogo-categorias"></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-
 <!--SECCIÓN CATÁLOGO + RESUMEN-->
 <div class="seccion-media-grid-catalogo">
 
     <!-- Columna izquierda: Catálogo -->
     <section class="container-secondary seccion catalogo-productos">
-        <div class="seccion__header">
+        <div class="seccion__header catalogo-header">
             <div class="seccion__icono"><i class='bx bx-package'></i></div>
             <span class="seccion__titulo">Catálogo de productos</span>
+
+            <div class="seccion__search catalogo-search">
+                <i class='bx bx-search-alt-2'></i>
+                <input type="search" placeholder="Buscar productos o combos..." id="buscador-global">
+            </div>
+
+            <div class="filtro-categorias">
+                <button type="button" class="btn-toggle-icon" id="btn-filtro-categorias"
+                        aria-expanded="false" aria-controls="menu-filtro-categorias"
+                        title="Filtrar por categoría">
+                    <i class='bx bx-category'></i>
+                    <span class="filtro-categorias__label">Categorías</span>
+                    <span class="filtro-categorias__count" id="filtro-categorias-count" hidden>0</span>
+                    <i class='bx bx-chevron-down toggle-arrow'></i>
+                </button>
+
+                <div class="menu-filtro-categorias" id="menu-filtro-categorias"
+                     role="group" aria-label="Filtrar por categoría" hidden>
+                    <button type="button" class="opcion-categoria opcion-categoria--todas"
+                            data-nombre="" aria-pressed="true">
+                        <span class="opcion-categoria__texto">Todas las categorías</span>
+                        <i class='bx bx-check opcion-categoria__check'></i>
+                    </button>
+                    <div class="opcion-categoria__lista" id="opciones-categorias"></div>
+
+                    <div class="menu-filtro-categorias__footer">
+                        <button type="button" class="btn-limpiar-filtro" id="btn-limpiar-filtro-categorias"
+                                aria-label="Limpiar filtros de categoría" disabled>
+                            <i class='bx bx-x'></i>
+                            Limpiar filtro
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="seccion__body">
