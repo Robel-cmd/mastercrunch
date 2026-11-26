@@ -261,3 +261,6 @@ ALTER TABLE `factura_detalle`
       (`id_producto` IS NOT NULL AND `id_combo` IS NULL)
    OR (`id_producto` IS NULL AND `id_combo` IS NOT NULL)
   );
+
+-- 4. se agregao el hash del pin de cambio de usuario 
+ALTER TABLE empleados  ADD COLUMN pin_hash VARCHAR(255) NULL AFTER contrasena_hash;
