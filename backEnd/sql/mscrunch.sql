@@ -243,3 +243,21 @@ SELECT 1, `id_permiso` FROM `permisos`;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
+-- Cambios en la tabla factura_detalle 25/11/2026
+-- 1. Permitir nulos en id_producto
+ALTER TABLE `factura_detalle`
+  MODIFY `id_producto` INT(11) DEFAULT NULL;
+
+-- 2. Agregar id_combo con FK e índice
+ALTER TABLE `factura_detalle`
+  ADD COLUMN `id_combo` INT(11) DEFAULT NULL AFTER `id_producto`,
+  ADD KEY `fk_facturadet_combo` (`id_combo`),
+  ADD CONSTRAINT `fk_facturadet_combo`
+      FOREIGN KEY (`id_combo`) REFERENCES `combo` (`id_combo`) ON UPDATE CASCADE;
+
+-- 3. Agregar CHECK de exclusividad
+ALTER TABLE `factura_detalle`
+  ADD CONSTRAINT `chk_facturadet_item` CHECK (
+      (`id_producto` IS NOT NULL AND `id_combo` IS NULL)
+   OR (`id_producto` IS NULL AND `id_combo` IS NOT NULL)
+  );
