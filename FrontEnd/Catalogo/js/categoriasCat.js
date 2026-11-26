@@ -1,115 +1,204 @@
 function initCategoriasCatalogo() {
 
-    // Ruta dinámica
     const apiUrl = `${window.API_BASE}/meta.php?entity=categoria`;
+    let _todasLasCategorias = [];
+    let _categoriasRenderizadas = [];
 
-    let _paginaCatActual = 1;
-    let _categoriasMostradas = [];
-    const CATEGORIAS_POR_PAGINA = 6; // máximo
-    const ANCHO_TARJETA_CAT = 280;   // 260px tarjeta + gap
+    // Estado compartido: ahora admite varias categorías seleccionadas
+    if (!window._catalogoFiltros) window._catalogoFiltros = { texto: '', categorias: [] };
+    if (!Array.isArray(window._catalogoFiltros.categorias)) window._catalogoFiltros.categorias = [];
 
-    //tarjetas de categorías
-    function renderizarCategorias(registros) {
-        const categoriasContainer = document.getElementById('categorias-container');
-        if (!categoriasContainer) return;
+    const btnFiltro  = document.getElementById('btn-filtro-categorias');
+    const menuFiltro = document.getElementById('menu-filtro-categorias');
 
-        categoriasContainer.innerHTML = '';
+    function urlImagen(categoria) {
+        const relativa = (categoria.imagen && categoria.imagen.trim() !== '')
+            ? categoria.imagen
+            : 'uploads/default/default-image.jpg';
+        return `${window.BASE_URL}/${relativa}`;
+    }
 
-        // Estado vacío
-        if (!registros || registros.length === 0) {
-            categoriasContainer.innerHTML = `
-                <div class="no-results" style="text-align:center; width:100%; padding:20px;">
-                    No se encontraron categorías
-                </div>
-            `;
-            renderPaginacion(document.getElementById('paginacion-catalogo-categorias'), 1, 0, CATEGORIAS_POR_PAGINA, () => {});
+    function seleccionadas() {
+        return window._catalogoFiltros.categorias || [];
+    }
+
+    function normalizar(nombre) {
+        return String(nombre || '').trim().toLowerCase();
+    }
+
+    function escapar(valor) {
+        return String(valor ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function sincronizarIndicadores() {
+        const total = seleccionadas().length;
+
+        const contador = document.getElementById('filtro-categorias-count');
+        if (contador) {
+            contador.textContent = String(total);
+            contador.hidden = total === 0;
+        }
+
+        const todas = document.querySelector('.opcion-categoria--todas');
+        if (todas) todas.setAttribute('aria-pressed', total === 0 ? 'true' : 'false');
+
+        const limpiar = document.getElementById('btn-limpiar-filtro-categorias');
+        if (limpiar) limpiar.disabled = total === 0;
+    }
+
+    // Actualiza solo los atributos: no reconstruye el DOM para no perder
+    // el objetivo del scroll con la rueda del ratón al marcar categorías.
+    function sincronizarOpciones() {
+        const lista = document.getElementById('opciones-categorias');
+        if (!lista) return;
+
+        const activas = seleccionadas().map(normalizar);
+        lista.querySelectorAll('.opcion-categoria').forEach(opcion => {
+            const activa = activas.includes(normalizar(opcion.dataset.nombre || ''));
+            opcion.setAttribute('aria-pressed', activa ? 'true' : 'false');
+        });
+
+        sincronizarIndicadores();
+    }
+
+    // Dibuja las opciones compactas del desplegable (imagen + nombre + check)
+    function renderOpciones() {
+        const lista = document.getElementById('opciones-categorias');
+        if (!lista) return;
+
+        const scrollTop = lista.scrollTop;
+
+        if (_todasLasCategorias.length === 0) {
+            lista.innerHTML = `<p class="filtro-categorias__vacio">No hay categorías disponibles</p>`;
+            _categoriasRenderizadas = [];
+            sincronizarIndicadores();
             return;
         }
 
-        _categoriasMostradas = registros;
-        const porPagina = calcularPorPagina(categoriasContainer, CATEGORIAS_POR_PAGINA, ANCHO_TARJETA_CAT);
+        const activas = seleccionadas().map(normalizar);
 
-        const totalPaginas = Math.max(1, Math.ceil(registros.length / porPagina));
-        if (_paginaCatActual > totalPaginas) _paginaCatActual = totalPaginas;
+        lista.innerHTML = _todasLasCategorias.map(categoria => {
+            const nombre = categoria.nombre || '';
+            const activa = activas.includes(normalizar(nombre));
 
-        const inicio   = (_paginaCatActual - 1) * porPagina;
-        const visibles = registros.slice(inicio, inicio + porPagina);
-
-        let html = '';
-
-        visibles.forEach(item => {
-            const urlRelativa = (item.imagen && item.imagen.trim() !== '')
-                ? item.imagen
-                : 'uploads/default/default-image.jpg';
-
-            const urlImagen = `${window.BASE_URL}/${urlRelativa}`;
-
-            const descripcion = item.descripcion || '';
-
-            html += `
-                <article class="categoria-card-catalogo" data-nombre="${item.nombre}" data-id="${item.id_categoria ?? item.id}">
-                    <img src="${urlImagen}" alt="Imagen de ${item.nombre}">
-                    <h3>${item.nombre}</h3>
-                    <p>${descripcion}</p>
-                </article>
+            return `
+                <button type="button" class="opcion-categoria" data-nombre="${escapar(nombre)}"
+                        aria-pressed="${activa ? 'true' : 'false'}">
+                    <img class="opcion-categoria__img" src="${escapar(urlImagen(categoria))}" alt="">
+                    <span class="opcion-categoria__texto">${escapar(nombre)}</span>
+                    <i class='bx bx-check opcion-categoria__check'></i>
+                </button>
             `;
-        });
+        }).join('');
 
-        categoriasContainer.innerHTML = html;
-
-        renderPaginacion(
-            document.getElementById('paginacion-catalogo-categorias'),
-            _paginaCatActual,
-            _categoriasMostradas.length,
-            porPagina,
-            (p) => { _paginaCatActual = p; renderizarCategorias(_categoriasMostradas); }
-        );
+        _categoriasRenderizadas = _todasLasCategorias.map(c => normalizar(c.nombre || ''));
+        lista.scrollTop = scrollTop;
+        sincronizarIndicadores();
     }
 
-    // Al cambiar el tamaño de pantalla, recalcular cuántos ítems caben
-    window.addEventListener('resize', () => {
-        if (_categoriasMostradas.length > 0) renderizarCategorias(_categoriasMostradas);
-    });
+    // En el polling solo redibuja si cambió el conjunto de categorías.
+    function actualizarOpciones() {
+        const lista = document.getElementById('opciones-categorias');
+        const actuales = _todasLasCategorias.map(c => normalizar(c.nombre || ''));
+        const iguales = _categoriasRenderizadas.length === actuales.length &&
+            actuales.every((nombre, i) => nombre === _categoriasRenderizadas[i]);
 
-    // Cargar categorías (el filtro de texto se aplica en el render)
-    function fetchCategorias() {
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                const registros = Array.isArray(data) ? data : (data.registros || []);
-                _todasLasCategorias = registros;
-                renderConFiltroTexto();
-            })
-            .catch(error => {
-                console.error('Error al obtener las categorías:', error);
-                _todasLasCategorias = [];
-                renderizarCategorias([]);
-            });
+        if (!lista || !lista.querySelector('.opcion-categoria') || !iguales) {
+            renderOpciones();
+            return;
+        }
+
+        sincronizarOpciones();
     }
 
-    let _todasLasCategorias = [];
+    function abrirMenu(abierto) {
+        if (!menuFiltro || !btnFiltro) return;
+        menuFiltro.hidden = !abierto;
+        btnFiltro.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    }
 
-    // Aplica el texto del buscador global al carrusel de categorías
-    function renderConFiltroTexto() {
-        const texto = ((window._catalogoFiltros && window._catalogoFiltros.texto) || '')
-            .trim().toLowerCase();
-        const filtradas = !texto
-            ? _todasLasCategorias
-            : _todasLasCategorias.filter(c =>
-                String(c.nombre || '').toLowerCase().includes(texto) ||
-                String(c.descripcion || '').toLowerCase().includes(texto)
-              );
-        renderizarCategorias(filtradas);
+    function limpiarCategorias() {
+        const filtros = window._catalogoFiltros;
+        if (!filtros || !seleccionadas().length) return;
 
-        // Mantener la categoría activa visualmente tras un re-render
-        const activa = window._catalogoFiltros && window._catalogoFiltros.categoria;
-        if (activa) {
-            const tag = document.querySelector(`.categoria-card-catalogo[data-nombre="${activa}"]`);
-            if (tag) tag.classList.add('selected');
+        filtros.categorias = [];
+        sincronizarOpciones();
+        if (typeof window.renderCatalogoConFiltros === 'function') {
+            window.renderCatalogoConFiltros(true);
         }
     }
 
-    window.addEventListener('catalogo:texto', renderConFiltroTexto);
+    function alternarCategoria(nombre) {
+        const filtros = window._catalogoFiltros;
+        filtros.categorias = filtros.categorias || [];
+
+        if (!nombre) {
+            limpiarCategorias();
+            return;
+        }
+
+        const buscada = normalizar(nombre);
+        const indice = filtros.categorias.findIndex(c => normalizar(c) === buscada);
+        if (indice >= 0) filtros.categorias.splice(indice, 1);
+        else filtros.categorias.push(nombre);
+
+        sincronizarOpciones();
+        if (typeof window.renderCatalogoConFiltros === 'function') {
+            window.renderCatalogoConFiltros(true);
+        }
+    }
+
+    if (btnFiltro && menuFiltro && !btnFiltro.dataset.bindFiltroCategorias) {
+        btnFiltro.dataset.bindFiltroCategorias = '1';
+
+        btnFiltro.addEventListener('click', (e) => {
+            e.stopPropagation();
+            abrirMenu(menuFiltro.hidden);
+        });
+
+        menuFiltro.addEventListener('click', (e) => {
+            if (e.target.closest('#btn-limpiar-filtro-categorias')) {
+                limpiarCategorias();
+                return;
+            }
+
+            const opcion = e.target.closest('.opcion-categoria');
+            if (!opcion || !menuFiltro.contains(opcion)) return;
+            alternarCategoria(opcion.dataset.nombre || '');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (menuFiltro.hidden) return;
+            if (menuFiltro.contains(e.target) || btnFiltro.contains(e.target)) return;
+            abrirMenu(false);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !menuFiltro.hidden) {
+                abrirMenu(false);
+                btnFiltro.focus();
+            }
+        });
+    }
+
+    async function fetchCategorias() {
+        try {
+            const response = await fetch(apiUrl, { cache: 'no-store' });
+            const data = await response.json();
+            _todasLasCategorias = Array.isArray(data) ? data : (data.registros || []);
+        } catch (error) {
+            console.error('Error al obtener las categorías:', error);
+            _todasLasCategorias = [];
+        }
+        actualizarOpciones();
+    }
+
+    window.renderFiltroCategorias = actualizarOpciones;
 
     fetchCategorias();
     window.registerPoll(fetchCategorias, 5000);

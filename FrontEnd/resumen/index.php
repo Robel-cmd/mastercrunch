@@ -11,14 +11,13 @@
 </header>
 
     <!--Contenido-->
-    <section class="container">
-        <div class="header-card-container">
-            <div class="icon-image">
-                <i class='bx bx-data'></i>
-                <span class="titulo">Datos generales</span>
-            </div>
+    <section class="container seccion">
+        <div class="seccion__header">
+            <div class="seccion__icono"><i class='bx bx-data'></i></div>
+            <span class="seccion__titulo">Datos generales</span>
         </div>
 
+        <div class="seccion__body">
         <!-- Contenedor exclusivo para las tarjetas de KPI -->
         <div class="kpi-grid">
             <!--Productividad de los colaboradores-->
@@ -74,71 +73,46 @@
                 </div>
             </div>
         </div>
-
-
+        </div>
     </section>
     <!--Contenido de las graficas-->
     <div class="charts-grid-container">
         
-        <section class="container" style="margin-top: 0;">
-            <div class="header-card-container">
-                <div class="icon-image">
-                    <i class='bx bx-line-chart'></i>
-                    <span class="titulo">Ventas por empleado</span>
-                </div>
+        <section class="container seccion" style="margin-top: 0;">
+            <div class="seccion__header">
+                <div class="seccion__icono"><i class='bx bx-line-chart'></i></div>
+                <span class="seccion__titulo">Ventas por empleado</span>
             </div>
-            <div style="position: relative; width: 100%; height: 280px; margin-top: 15px;">
-                <canvas id="ventas_por_empleado"></canvas>
-            </div>
-        </section>
-
-        <section class="container" style="margin-top: 0;">
-            <div class="header-card-container">
-                <div class="icon-image">
-                    <i class='bx bx-medal'></i>
-                    <span class="titulo">Productos mas vendidos</span>
-                </div>
-            </div>
-            <div style="position: relative; width: 100%; height: 280px; margin-top: 15px;">
-                <canvas id="productos_mas_vendidos"></canvas>
-            </div>
-        </section>
-    </div>
-
-        <section class="container" style="margin-top: 32;">
-            <div class="header-card-container">
-                <div class="icon-image">
-                    <i class='bx bx-time'></i>
-                    <span class="titulo">Ventas por hora</span>
-                </div>
-            </div>
-            <div style="position: relative; width: 100%; height: 280px; margin-top: 32px;">
-                <canvas id="ventas_por_hora"></canvas>
-            </div>
-        </section>
-    <div class="charts-grid-container">
-            <section class="container" style="margin-top: 0;">
-                <div class="header-card-container">
-                    <div class="icon-image">
-                        <i class='bx bx-pie-chart-alt'></i>
-                        <span class="titulo">none</span>
-                    </div>
-                </div>
+            <div class="seccion__body">
                 <div style="position: relative; width: 100%; height: 280px; margin-top: 15px;">
-                    <canvas id=""></canvas>
+                    <canvas id="ventas_por_empleado"></canvas>
                 </div>
+            </div>
         </section>
-            <section class="container" style="margin-top: 0;">
-                <div class="header-card-container">
-                    <div class="icon-image">
-                        <i class='bx bx-bar-chart-square'></i>
-                        <span class="titulo">none</span>
-                    </div>
+
+        <section class="container seccion" style="margin-top: 0;">
+            <div class="seccion__header">
+                <div class="seccion__icono"><i class='bx bx-medal'></i></div>
+                <span class="seccion__titulo">Productos mas vendidos</span>
+            </div>
+            <div class="seccion__body">
+                <div style="position: relative; width: 100%; height: 280px; margin-top: 15px;">
+                    <canvas id="productos_mas_vendidos"></canvas>
                 </div>
-                    <div style="position: relative; width: 100%; height: 280px; margin-top: 15px;">
-                        <canvas id=""></canvas>
-                    </div>
+            </div>
         </section>
     </div>
+
+        <section class="container seccion" style="margin-top: 32px;">
+            <div class="seccion__header">
+                <div class="seccion__icono"><i class='bx bx-time'></i></div>
+                <span class="seccion__titulo">Ventas por hora</span>
+            </div>
+            <div class="seccion__body">
+                <div style="position: relative; width: 100%; height: 280px; margin-top: 32px;">
+                    <canvas id="ventas_por_hora"></canvas>
+                </div>
+            </div>
+        </section>
 </body>
 </html>

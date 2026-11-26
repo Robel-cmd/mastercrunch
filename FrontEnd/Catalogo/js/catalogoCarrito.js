@@ -19,7 +19,7 @@ function renderCarrito() {
             <article class="pedido-item pedido-item--${item.tipo || 'producto'}">
                 <div class="item-header">
                     <h4>${item.nombre} <span class="pedido-tipo pedido-tipo-${item.tipo || 'producto'}">${item.tipo === 'combo' ? 'Combo' : item.tipo === 'extra' ? 'Extra' : 'Producto'}</span></h4>
-                    <button class="btn-eliminar" data-eliminar-item="${idx}" title="Quitar">🗑️</button>
+                    <button class="btn-eliminar btn-ui btn-ui--secondary btn-ui--icon" data-eliminar-item="${idx}" title="Quitar">🗑️</button>
                 </div>
                 <div class="item-precio-cantidad">
                     <span class="precio">${parseFloat(item.precio).toFixed(2)} Lps</span>
@@ -64,28 +64,59 @@ function agregarAlCarrito(item, tipo = 'producto') {
     renderCarrito();
 }
 
-function abrirModalCombo(combo) {
-    const modal = document.getElementById('modal-combo-catalogo');
+function abrirDetalleCatalogo(item, tipo) {
+    const modal = document.getElementById('modal-detalle-catalogo');
     if (!modal) return;
 
-    document.getElementById('combo-modal-titulo').textContent = combo.nombre;
-    document.getElementById('combo-modal-descripcion').textContent = combo.categoria_nombre || '';
+    const setText = (id, valor) => {
+        const elemento = document.getElementById(id);
+        if (elemento) elemento.textContent = valor;
+    };
 
-    const lista = document.getElementById('combo-modal-lista');
-    lista.innerHTML = '';
+    const urlRelativa = (item.url_imagen && item.url_imagen.trim() !== '')
+        ? item.url_imagen
+        : 'uploads/default/default-image.jpg';
 
-    if (combo.detalles && Array.isArray(combo.detalles)) {
-        combo.detalles.forEach(det => {
-            const li = document.createElement('li');
-            li.innerHTML = `<span class="combo-detalle-item">x${det.cantidad} de ${det.producto_nombre}</span> — <span class="combo-detalle-precio">Lps.${det.precio_individual}</span>`;
-            lista.appendChild(li);
-        });
+    const imagen = document.getElementById('detalle-modal-imagen');
+    if (imagen) {
+        imagen.src = `${window.BASE_URL}/${urlRelativa}`;
+        imagen.alt = item.nombre || '';
     }
 
-    document.getElementById('combo-modal-precio').textContent = `Total: ${parseFloat(combo.precio).toFixed(2)} Lps`;
+    const precio = parseFloat(item.precio);
 
-    // Asignar combo al modal para el botón Agregar
-    modal.dataset.comboSelect = JSON.stringify(combo);
+    setText('detalle-modal-nombre', item.nombre || '—');
+    setText('detalle-modal-tipo', tipo === 'combo' ? 'Combo' : tipo === 'extra' ? 'Extra' : 'Producto');
+    setText('detalle-modal-categoria', item.categoria_nombre || 'Sin categoría');
+    setText('detalle-modal-precio', Number.isFinite(precio) ? `${precio.toFixed(2)} Lps` : '—');
+
+    const descripcion = item.descripcion ? String(item.descripcion).trim() : '';
+    setText('detalle-modal-descripcion', descripcion || 'Sin descripción');
+
+    const bloqueCombo = document.getElementById('detalle-modal-combo');
+    const listaCombo = document.getElementById('detalle-modal-lista');
+
+    if (bloqueCombo && listaCombo) {
+        listaCombo.innerHTML = '';
+
+        if (tipo === 'combo' && Array.isArray(item.detalles)) {
+            item.detalles.forEach(det => {
+                const li = document.createElement('li');
+                const precioDetalle = parseFloat(det.precio_individual);
+                const precioTexto = Number.isFinite(precioDetalle)
+                    ? `${precioDetalle.toFixed(2)} Lps`
+                    : '—';
+                li.textContent = `x${det.cantidad} de ${det.producto_nombre} — ${precioTexto}`;
+                listaCombo.appendChild(li);
+            });
+            bloqueCombo.hidden = false;
+        } else {
+            bloqueCombo.hidden = true;
+        }
+    }
+
+    modal.dataset.itemDetalle = JSON.stringify(item);
+    modal.dataset.tipoDetalle = tipo;
 
     if (!modal.open) modal.showModal();
 }
@@ -182,7 +213,7 @@ function initCarrito() {
 }
 
 function initCatalogoItems() {
-    // Clicks en el catálogo: producto -> carrito, combo -> modal
+    // Clicks en el catálogo: botón abre detalle; el resto de la tarjeta agrega
     const grid = document.getElementById('catalogo-container');
     if (!grid || grid.dataset.bindItems) {
         if (grid) grid.dataset.bindItems = '1';
@@ -199,42 +230,52 @@ function initCatalogoItems() {
         const item = items.find(i => String(i.id) === String(id));
         if (!item) return;
 
-        if (card.classList.contains('combo-card')) {
-            abrirModalCombo(item);
-        } else if (card.classList.contains('extra-card')) {
-            agregarAlCarrito(item, 'extra');
+        const tipo = card.classList.contains('combo-card')
+            ? 'combo'
+            : card.classList.contains('extra-card')
+                ? 'extra'
+                : 'producto';
+
+        if (e.target.closest('[data-ver-detalle]')) {
+            abrirDetalleCatalogo(item, tipo);
         } else {
-            agregarAlCarrito(item, 'producto');
+            agregarAlCarrito(item, tipo);
         }
     });
 }
 
-function initModalComboCatalogo() {
-    const modal = document.getElementById('modal-combo-catalogo');
-    if (!modal) return;
+function initDetalleCatalogo() {
+    const modal = document.getElementById('modal-detalle-catalogo');
+    if (!modal || modal.dataset.bindDetalle) return;
+    modal.dataset.bindDetalle = '1';
 
     const cerrar = () => { if (modal.open) modal.close(); };
 
-    const btnCerrar = document.getElementById('btn-close-combo-catalogo');
-    const btnCancelar = document.getElementById('btn-cancel-combo-catalogo');
+    const btnCerrar = document.getElementById('btn-close-detalle-catalogo');
+    const btnCerrarFooter = document.getElementById('btn-cerrar-detalle-catalogo');
+    const btnAgregar = document.getElementById('btn-agregar-detalle-catalogo');
+
     if (btnCerrar) btnCerrar.addEventListener('click', cerrar);
-    if (btnCancelar) btnCancelar.addEventListener('click', cerrar);
+    if (btnCerrarFooter) btnCerrarFooter.addEventListener('click', cerrar);
+
+    if (btnAgregar) {
+        btnAgregar.addEventListener('click', () => {
+            let item = null;
+            try {
+                item = JSON.parse(modal.dataset.itemDetalle || '{}');
+            } catch (_) {
+                item = null;
+            }
+
+            const tipo = modal.dataset.tipoDetalle || 'producto';
+            if (item && item.nombre) agregarAlCarrito(item, tipo);
+            cerrar();
+        });
+    }
 
     // Cerrar al hacer click fuera
     modal.addEventListener('click', (e) => {
         const r = modal.getBoundingClientRect();
         if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) cerrar();
     });
-
-    const btnAgregar = document.getElementById('btn-agregar-combo-catalogo');
-    if (btnAgregar) {
-        btnAgregar.addEventListener('click', () => {
-            let combo = null;
-            try {
-                combo = JSON.parse(modal.dataset.comboSelect || '{}');
-            } catch (_) { combo = null; }
-            if (combo && combo.nombre) agregarAlCarrito(combo, 'combo');
-            cerrar();
-        });
-    }
 }

@@ -1,0 +1,265 @@
+/* =========================================================
+   Sistema de botones: 5 variantes x 4 estados
+   (default / hover / active / disabled)
+
+   Se carga después de los CSS de los módulos para imponer el
+   componente sin borrar sus reglas de layout. Los colores del
+   Figma se adaptan a tokens y a modo claro/oscuro.
+   ========================================================= */
+
+:root{
+    /* Geometría y tipografía del componente */
+    --ui-btn-font: 'Plus Jakarta Sans', sans-serif;
+    --ui-btn-radius: 1.875rem;          /* 30px */
+    --ui-btn-padding: 0.625rem;         /* 10px */
+    --ui-btn-gap: 0.625rem;             /* 10px */
+    --ui-btn-min-height: 2.1875rem;     /* 35px */
+    --ui-btn-label-size: 0.8125rem;     /* 13px */
+    --ui-btn-icon-size: 1.3125rem;      /* 21px */
+    --ui-btn-text: #FFFFFF;
+
+    /* Tamaño grande para botones de modal y de advertencia */
+    --ui-btn-lg-min-height: 2.75rem;    /* 44px */
+    --ui-btn-lg-padding: 0.75rem 1rem;  /* 12px 16px */
+    --ui-btn-lg-label-size: 0.875rem;   /* 14px */
+
+    /* Primario - acciones de sección */
+    --ui-btn-primary: #FF5900;
+    --ui-btn-primary-hover: #C84600;
+    --ui-btn-primary-active: #FF600B;
+    --ui-btn-primary-disabled: #523626;
+    --ui-btn-primary-outline: #FF5900;  /* Figma traía #FF0004; se adapta */
+    --ui-btn-primary-ring: rgba(255, 89, 0, 0.14);
+    --ui-btn-primary-disabled-text: #929292;
+
+    /* Secundario - borrar, eliminar, cancelar */
+    --ui-btn-secondary: #FF5E5E;
+    --ui-btn-secondary-hover: #BF0808;
+    --ui-btn-secondary-active: #FF5E5E;
+    --ui-btn-secondary-disabled: #FFC9C9;
+    --ui-btn-secondary-outline: #FF5E5E; /* Figma traía #FF0000; se adapta */
+    --ui-btn-secondary-ring: rgba(255, 94, 94, 0.14);
+    --ui-btn-secondary-disabled-text: #6B7280; /* contraste sobre #FFC9C9 */
+
+    /* Terciario - confirmar, agregar, facturar */
+    --ui-btn-tertiary: #7285FF;
+    --ui-btn-tertiary-hover: #031ECE;
+    --ui-btn-tertiary-active: #7285FF;
+    --ui-btn-tertiary-disabled: #CCD2FF;
+    --ui-btn-tertiary-outline: #7285FF;  /* Figma traía #0022FF; se adapta */
+    --ui-btn-tertiary-ring: rgba(114, 133, 255, 0.14);
+    --ui-btn-tertiary-disabled-text: #4A4A4A; /* contraste sobre #CCD2FF */
+
+    /* Success - activar */
+    --ui-btn-success: #00C851;
+    --ui-btn-success-hover: #009B3E;
+    --ui-btn-success-active: #2BD471;
+    --ui-btn-success-disabled: #DFF5E1;
+    --ui-btn-success-outline: #00C851;
+    --ui-btn-success-ring: rgba(0, 200, 81, 0.14);
+    --ui-btn-success-disabled-text: #4A4A4A; /* contraste sobre #DFF5E1 */
+
+    /* Ghost - acciones de baja jerarquía */
+    --ui-btn-ghost: #B7B7B7;
+    --ui-btn-ghost-hover: #918A8A;
+    --ui-btn-ghost-active: #B7B7B7;
+    --ui-btn-ghost-disabled: #EAEAEA;
+    --ui-btn-ghost-outline: #707070;
+    --ui-btn-ghost-ring: rgba(183, 183, 183, 0.14);
+    --ui-btn-ghost-disabled-text: #6B7280; /* contraste sobre #EAEAEA */
+
+    --ui-btn-hover-shadow: 7px 4px 4px rgba(0, 0, 0, 0.15);
+}
+
+body.dark-mode{
+    --ui-btn-hover-shadow: 7px 4px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Base ---------- */
+.btn-ui{
+    --ui-btn-bg: var(--ui-btn-ghost);
+    --ui-btn-bg-hover: var(--ui-btn-ghost-hover);
+    --ui-btn-bg-active: var(--ui-btn-ghost-active);
+    --ui-btn-bg-disabled: var(--ui-btn-ghost-disabled);
+    --ui-btn-outline: var(--ui-btn-ghost-outline);
+    --ui-btn-ring: var(--ui-btn-ghost-ring);
+    --ui-btn-disabled-text: var(--ui-btn-ghost-disabled-text);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ui-btn-gap);
+    min-height: var(--ui-btn-min-height);
+    padding: var(--ui-btn-padding);
+    background-color: var(--ui-btn-bg);
+    color: var(--ui-btn-text);
+    border: 0;
+    border-radius: var(--ui-btn-radius);
+    font-family: var(--ui-btn-font);
+    font-size: var(--ui-btn-label-size);
+    font-weight: 400;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: none;
+    outline: none;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.12s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.btn-ui i,
+.btn-ui .bx{
+    font-size: var(--ui-btn-icon-size);
+    line-height: 1;
+}
+
+/* ---------- Variantes ---------- */
+.btn-ui--primary{
+    --ui-btn-bg: var(--ui-btn-primary);
+    --ui-btn-bg-hover: var(--ui-btn-primary-hover);
+    --ui-btn-bg-active: var(--ui-btn-primary-active);
+    --ui-btn-bg-disabled: var(--ui-btn-primary-disabled);
+    --ui-btn-outline: var(--ui-btn-primary-outline);
+    --ui-btn-ring: var(--ui-btn-primary-ring);
+    --ui-btn-disabled-text: var(--ui-btn-primary-disabled-text);
+}
+
+.btn-ui--secondary{
+    --ui-btn-bg: var(--ui-btn-secondary);
+    --ui-btn-bg-hover: var(--ui-btn-secondary-hover);
+    --ui-btn-bg-active: var(--ui-btn-secondary-active);
+    --ui-btn-bg-disabled: var(--ui-btn-secondary-disabled);
+    --ui-btn-outline: var(--ui-btn-secondary-outline);
+    --ui-btn-ring: var(--ui-btn-secondary-ring);
+    --ui-btn-disabled-text: var(--ui-btn-secondary-disabled-text);
+}
+
+.btn-ui--tertiary{
+    --ui-btn-bg: var(--ui-btn-tertiary);
+    --ui-btn-bg-hover: var(--ui-btn-tertiary-hover);
+    --ui-btn-bg-active: var(--ui-btn-tertiary-active);
+    --ui-btn-bg-disabled: var(--ui-btn-tertiary-disabled);
+    --ui-btn-outline: var(--ui-btn-tertiary-outline);
+    --ui-btn-ring: var(--ui-btn-tertiary-ring);
+    --ui-btn-disabled-text: var(--ui-btn-tertiary-disabled-text);
+}
+
+.btn-ui--success{
+    --ui-btn-bg: var(--ui-btn-success);
+    --ui-btn-bg-hover: var(--ui-btn-success-hover);
+    --ui-btn-bg-active: var(--ui-btn-success-active);
+    --ui-btn-bg-disabled: var(--ui-btn-success-disabled);
+    --ui-btn-outline: var(--ui-btn-success-outline);
+    --ui-btn-ring: var(--ui-btn-success-ring);
+    --ui-btn-disabled-text: var(--ui-btn-success-disabled-text);
+}
+
+.btn-ui--ghost{
+    --ui-btn-bg: var(--ui-btn-ghost);
+    --ui-btn-bg-hover: var(--ui-btn-ghost-hover);
+    --ui-btn-bg-active: var(--ui-btn-ghost-active);
+    --ui-btn-bg-disabled: var(--ui-btn-ghost-disabled);
+    --ui-btn-outline: var(--ui-btn-ghost-outline);
+    --ui-btn-ring: var(--ui-btn-ghost-ring);
+    --ui-btn-disabled-text: var(--ui-btn-ghost-disabled-text);
+}
+
+/* Botones de modal y de advertencia: objetivo táctil y texto mayores */
+.btn-ui--lg{
+    min-height: var(--ui-btn-lg-min-height);
+    padding: var(--ui-btn-lg-padding);
+    font-size: var(--ui-btn-lg-label-size);
+}
+
+/* Ocupa todo el ancho disponible (botones únicos de modal) */
+.btn-ui--block{
+    width: 100%;
+}
+
+/* Iconos sueltos (cerrar panel, quitar item del carrito) */
+.btn-ui--icon{
+    min-height: 1.75rem;
+    padding: 0;
+    border-radius: 50%;
+    gap: 0;
+    font-size: 1rem;
+}
+
+/* ---------- Estados ---------- */
+.btn-ui:hover:not(:disabled):not([aria-disabled="true"]){
+    background-color: var(--ui-btn-bg-hover);
+    color: var(--ui-btn-text);
+    box-shadow: var(--ui-btn-hover-shadow);
+}
+
+.btn-ui:active:not(:disabled):not([aria-disabled="true"]){
+    background-color: var(--ui-btn-bg-active);
+    color: var(--ui-btn-text);
+    outline: 1px solid var(--ui-btn-outline);
+    outline-offset: -1px;
+    box-shadow: 1px 0 4px 4px var(--ui-btn-ring);
+    transform: translateY(1px);
+}
+
+/* Reutiliza el anillo de "active" para navegación por teclado */
+.btn-ui:focus-visible{
+    outline: 1px solid var(--ui-btn-outline);
+    outline-offset: -1px;
+    box-shadow: 1px 0 4px 4px var(--ui-btn-ring);
+}
+
+.btn-ui:disabled,
+.btn-ui[aria-disabled="true"]{
+    background-color: var(--ui-btn-bg-disabled);
+    color: var(--ui-btn-disabled-text);
+    cursor: not-allowed;
+    box-shadow: none;
+    outline: none;
+    transform: none;
+    pointer-events: none;
+}
+
+/* ---------- Overrides de specificity ----------
+   Las reglas antiguas tienen más selectores que .btn-ui.
+   Se replican aquí con la misma specificity para que el
+   componente gane sin recurrir a !important. */
+
+/* Modales de confirmación (resumen.css) */
+.warning-modal .content-priority .btn-ui{
+    padding: var(--ui-btn-lg-padding);
+    min-height: var(--ui-btn-lg-min-height);
+    background-color: var(--ui-btn-bg);
+    color: var(--ui-btn-text);
+    border: 0;
+    border-radius: var(--ui-btn-radius);
+    font-size: var(--ui-btn-lg-label-size);
+    font-weight: 400;
+}
+.warning-modal .content-priority .btn-ui:hover:not(:disabled){
+    background-color: var(--ui-btn-bg-hover);
+    color: var(--ui-btn-text);
+}
+.warning-modal .content-priority .btn-ui:active:not(:disabled){
+    background-color: var(--ui-btn-bg-active);
+    outline: 1px solid var(--ui-btn-outline);
+    outline-offset: -1px;
+    box-shadow: 1px 0 4px 4px var(--ui-btn-ring);
+}
+.warning-modal .content-priority .btn-ui:disabled{
+    background-color: var(--ui-btn-bg-disabled);
+    color: var(--ui-btn-disabled-text);
+}
+
+/* "Preparar todos" en Cocina (cocina.css) */
+.cocina-column-header .btn-ui--primary{
+    padding: var(--ui-btn-padding);
+    min-height: var(--ui-btn-min-height);
+    background-color: var(--ui-btn-bg);
+    color: var(--ui-btn-text);
+    border: 0;
+    border-radius: var(--ui-btn-radius);
+    font-size: var(--ui-btn-label-size);
+    font-weight: 400;
+}

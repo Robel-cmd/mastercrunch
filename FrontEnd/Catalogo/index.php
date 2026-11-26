@@ -3,74 +3,64 @@
     <h4>Realice ventas, pedidos.</h4>
 </header>
 
-<!--BARRA DE BÚSQUEDA GLOBAL-->
-<section class="container-secondary seccion-categorias-sticky">
-    <div class="header-card-container categorias-header">
-        <div class="header-left">
-            <div class="icon-image">
-                <i class='bx bx-category-alt'></i>
-                <span class="titulo">Listado de categorías</span>
-            </div>
-        </div>
-
-        <div class="header-actions-group">
-            <!-- Toggle del buscador -->
-            <button class="btn-toggle-icon" id="btn-toggle-search" aria-expanded="true" title="Buscar">
-                <i class='bx bx-search'></i>
-                <i class='bx bx-chevron-down toggle-arrow'></i>
-            </button>
-
-            <!-- Toggle de categorías -->
-            <button class="btn-toggle-icon" id="btn-toggle-cats" aria-expanded="true" title="Categorías">
-                <i class='bx bx-category'></i>
-                <i class='bx bx-chevron-down toggle-arrow'></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Bloque colapsable: buscador global -->
-    <div class="search-bar-collapsible open" id="search-bar-collapsible">
-        <div class="search-general">
-            <i class='bx bx-search-alt-2'></i>
-            <input type="search" placeholder="Buscar en categorías, catálogo y tabla..." id="buscador-global">
-        </div>
-    </div>
-
-    <!-- Bloque colapsable: carrusel de categorías -->
-    <div class="cats-collapsible open" id="cats-collapsible">
-        <div class="cats-collapsible-inner">
-            <div class="carrusel-categorias" id="categorias-container"></div>
-            <div class="paginacion" id="paginacion-catalogo-categorias"></div>
-        </div>
-    </div>
-</section>
-
-
-
 <!--SECCIÓN CATÁLOGO + RESUMEN-->
 <div class="seccion-media-grid-catalogo">
 
     <!-- Columna izquierda: Catálogo -->
-    <section class="container-secondary catalogo-productos">
-        <div class="header-card-container">
-            <div class="icon-image">
-                <i class='bx bx-package'></i>
-                <span class="titulo">Catálogo de productos</span>
+    <section class="container-secondary seccion catalogo-productos">
+        <div class="seccion__header catalogo-header">
+            <div class="seccion__icono"><i class='bx bx-package'></i></div>
+            <span class="seccion__titulo">Catálogo de productos</span>
+
+            <div class="seccion__search catalogo-search">
+                <i class='bx bx-search-alt-2'></i>
+                <input type="search" placeholder="Buscar productos o combos..." id="buscador-global">
+            </div>
+
+            <div class="filtro-categorias">
+                <button type="button" class="btn-toggle-icon" id="btn-filtro-categorias"
+                        aria-expanded="false" aria-controls="menu-filtro-categorias"
+                        title="Filtrar por categoría">
+                    <i class='bx bx-category'></i>
+                    <span class="filtro-categorias__label">Categorías</span>
+                    <span class="filtro-categorias__count" id="filtro-categorias-count" hidden>0</span>
+                    <i class='bx bx-chevron-down toggle-arrow'></i>
+                </button>
+
+                <div class="menu-filtro-categorias" id="menu-filtro-categorias"
+                     role="group" aria-label="Filtrar por categoría" hidden>
+                    <button type="button" class="opcion-categoria opcion-categoria--todas"
+                            data-nombre="" aria-pressed="true">
+                        <span class="opcion-categoria__texto">Todas las categorías</span>
+                        <i class='bx bx-check opcion-categoria__check'></i>
+                    </button>
+                    <div class="opcion-categoria__lista" id="opciones-categorias"></div>
+
+                    <div class="menu-filtro-categorias__footer">
+                        <button type="button" class="btn-limpiar-filtro" id="btn-limpiar-filtro-categorias"
+                                aria-label="Limpiar filtros de categoría" disabled>
+                            <i class='bx bx-x'></i>
+                            Limpiar filtro
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="filtros-catalogo">
-            <button class="chip-filtro active" data-filtro="todos" type="button">Todos</button>
-            <button class="chip-filtro" data-filtro="productos" type="button">Productos</button>
-            <button class="chip-filtro" data-filtro="combos" type="button">Combos</button>
-            <button class="chip-filtro" data-filtro="extras" type="button">Extras</button>
-        </div>
+        <div class="seccion__body">
+            <div class="filtros-catalogo">
+                <button class="chip-filtro active" data-filtro="todos" type="button">Todos</button>
+                <button class="chip-filtro" data-filtro="productos" type="button">Productos</button>
+                <button class="chip-filtro" data-filtro="combos" type="button">Combos</button>
+                <button class="chip-filtro" data-filtro="extras" type="button">Extras</button>
+            </div>
 
-        <div class="grid-productos" id="catalogo-container">
-            <!-- Los productos se cargarán dinámicamente aquí -->
-        </div>
+            <div class="grid-productos" id="catalogo-container">
+                <!-- Los productos se cargarán dinámicamente aquí -->
+            </div>
 
-        <div class="paginacion" id="paginacion-catalogo-productos"></div>
+            <div class="paginacion" id="paginacion-catalogo-productos"></div>
+        </div>
     </section>
 
     <!-- Columna derecha: Resumen del pedido -->
@@ -85,8 +75,8 @@
         </div>
 
         <footer class="acciones-pedido">
-            <button class="btn-borrar">Borrar lista</button>
-            <button class="btn-facturar">Facturar pedido</button>
+            <button class="btn-borrar btn-ui btn-ui--secondary">Borrar lista</button>
+            <button class="btn-facturar btn-ui btn-ui--tertiary">Facturar pedido</button>
         </footer>
     </aside>
 </div>
@@ -107,8 +97,8 @@
             Los productos agregados se eliminarán.
         </p>
         <div>
-            <button class="cancelar-desactivar" id="cancelar-borrar-lista">No, regresar</button>
-            <button class="confirmar-desactivar" id="confirmar-borrar-lista">Sí, borrar</button>
+            <button class="cancelar-desactivar btn-ui btn-ui--ghost btn-ui--lg" id="cancelar-borrar-lista">No, regresar</button>
+            <button class="confirmar-desactivar btn-ui btn-ui--secondary btn-ui--lg" id="confirmar-borrar-lista">Sí, borrar</button>
         </div>
     </section>
 </dialog>
@@ -125,26 +115,50 @@
             Facturar estará disponible próximamente.
         </p>
         <div>
-            <button class="confirmar-desactivar" id="aceptar-modal-facturar">Aceptar</button>
+            <button class="confirmar-desactivar btn-ui btn-ui--tertiary btn-ui--lg" id="aceptar-modal-facturar">Aceptar</button>
         </div>
     </section>
 </dialog>
 
-<!-- Modal de detalle de combo -->
-<dialog class="modal" id="modal-combo-catalogo">
+<!-- Modal de detalle del catálogo (producto, combo o extra) -->
+<dialog class="modal modal-detalle-catalogo" id="modal-detalle-catalogo" aria-labelledby="detalle-modal-titulo">
     <header class="modal-header">
-        <h2 class="modal-title" id="combo-modal-titulo">Combo</h2>
-        <button class="modal-close" id="btn-close-combo-catalogo">X</button>
+        <h2 class="modal-title" id="detalle-modal-titulo">Detalle</h2>
+        <button class="modal-close" id="btn-close-detalle-catalogo" aria-label="Cerrar detalle">X</button>
     </header>
-    <section class="modal-content">
-        <div class="combo-detalle">
-            <p id="combo-modal-descripcion"></p>
-            <ul id="combo-modal-lista" class="combo-detalle-lista"></ul>
-            <p id="combo-modal-precio" class="combo-detalle-precio"></p>
+    <section class="modal-content detalle-catalogo">
+        <div class="detalle-catalogo__media">
+            <img id="detalle-modal-imagen" src="" alt="">
         </div>
+        <dl class="detalle-catalogo__datos">
+            <div class="detalle-catalogo__fila">
+                <dt>Nombre</dt>
+                <dd id="detalle-modal-nombre">—</dd>
+            </div>
+            <div class="detalle-catalogo__fila">
+                <dt>Tipo</dt>
+                <dd id="detalle-modal-tipo">—</dd>
+            </div>
+            <div class="detalle-catalogo__fila">
+                <dt>Categoría</dt>
+                <dd id="detalle-modal-categoria">—</dd>
+            </div>
+            <div class="detalle-catalogo__fila">
+                <dt>Precio</dt>
+                <dd id="detalle-modal-precio">—</dd>
+            </div>
+            <div class="detalle-catalogo__fila detalle-catalogo__fila--bloque">
+                <dt>Descripción</dt>
+                <dd id="detalle-modal-descripcion">—</dd>
+            </div>
+        </dl>
+        <section class="detalle-catalogo__combo" id="detalle-modal-combo" hidden>
+            <h3>Contenido del combo</h3>
+            <ul id="detalle-modal-lista"></ul>
+        </section>
         <div class="contenido-botones-modal">
-            <button class="emergente-btn" id="btn-cancel-combo-catalogo">Cancelar</button>
-            <button class="confirm-btn" id="btn-agregar-combo-catalogo">Agregar</button>
+            <button class="emergente-btn btn-ui btn-ui--secondary btn-ui--lg" id="btn-cerrar-detalle-catalogo">Cerrar</button>
+            <button class="confirm-btn btn-ui btn-ui--tertiary btn-ui--lg" id="btn-agregar-detalle-catalogo">Agregar</button>
         </div>
     </section>
 </dialog>
@@ -160,7 +174,7 @@
                 <i class='bx bx-receipt'></i>
                 <span class="titulo">Pedidos</span>
             </div>
-            <button class="btn-cerrar-panel" id="btn-cerrar-panel" aria-label="Cerrar">
+            <button class="btn-cerrar-panel btn-ui btn-ui--ghost btn-ui--icon" id="btn-cerrar-panel" aria-label="Cerrar">
                 <i class='bx bx-x'></i>
             </button>
         </header>

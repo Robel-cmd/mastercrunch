@@ -18,14 +18,16 @@ function initCategorias() {
     const apiURLProductos = `${API_BASE}/meta.php?entity=producto`;
 
 
-    function renderizarCategorias(registros) {
+    function renderizarCategorias(registros, preservarScroll = false) {
         const contenedor = document.querySelector('#contenedor-categorias');
         if (!contenedor) return;
-        contenedor.innerHTML = "";
+
+        const scrollY = window.scrollY;
 
         if (!registros || registros.length === 0) {
             contenedor.innerHTML = `<div style="text-align:center;width:100%;padding:20px;" class="noseencontro">No se encontraron categorías</div>`;
             renderPaginacion(document.getElementById('paginacion-categorias'), 1, 0, CATEGORIAS_POR_PAGINA, () => {});
+            if (preservarScroll) window.scrollTo(0, scrollY);
             return;
         }
 
@@ -45,6 +47,7 @@ function initCategorias() {
                 ? item.imagen
                 : "uploads/default/default-image.jpg";
             const cambiarEstadoBtn  = item.activo == 1 ? 'desactivar' : 'activar';
+            const varianteEstadoBtn = cambiarEstadoBtn === 'activar' ? 'btn-ui--success' : 'btn-ui--ghost';
             const textoEstadoVisual = item.activo == 0 ? 'Innactivo' : 'Activo';
 
             html += `
@@ -61,9 +64,9 @@ function initCategorias() {
                         <div class="card-estado ${esactivo}">${textoEstadoVisual}</div>
                     </div>
                     <div class="card-actions">
-                        <button type="button" class="btn btn-edit btn-editar-cat" data-id="${item.id_categoria}">Editar</button>
-                        <div class="btn btn-${cambiarEstadoBtn} btn-${cambiarEstadoBtn}-cat" data-id="${item.id_categoria}">${cambiarEstadoBtn}</div>
-                        <button type="button" class="btn btn-innactivo btn-eliminar-cat" data-id="${item.id_categoria}">Eliminar</button>
+                        <button type="button" class="btn btn-ui btn-ui--tertiary btn-edit btn-editar-cat" data-id="${item.id_categoria}">Editar</button>
+                        <div class="btn btn-ui ${varianteEstadoBtn} btn-${cambiarEstadoBtn} btn-${cambiarEstadoBtn}-cat" data-id="${item.id_categoria}">${cambiarEstadoBtn}</div>
+                        <button type="button" class="btn btn-ui btn-ui--secondary btn-innactivo btn-eliminar-cat" data-id="${item.id_categoria}">Eliminar</button>
                     </div>
                 </div>
             `;
@@ -77,6 +80,8 @@ function initCategorias() {
             porPagina,
             (p) => { _paginaCatActual = p; renderizarCategorias(_categoriasMostradas); }
         );
+
+        if (preservarScroll) window.scrollTo(0, scrollY);
     }
 
     window.addEventListener('resize', () => {
@@ -87,6 +92,10 @@ function initCategorias() {
         const selectAdd  = document.querySelector('#content-categorias-list');
         const selectEdit = document.querySelector('#content-categorias-list-edit');
 
+        // No perder la opción elegida si el poll corre con un modal abierto
+        const seleccionAdd  = selectAdd  ? selectAdd.value  : null;
+        const seleccionEdit = selectEdit ? selectEdit.value : null;
+
         if (selectAdd)  selectAdd.innerHTML  = "";
         if (selectEdit) selectEdit.innerHTML = "";
 
@@ -96,28 +105,32 @@ function initCategorias() {
             if (selectAdd)  selectAdd.innerHTML  += opt;
             if (selectEdit) selectEdit.innerHTML += opt;
         });
+
+        if (seleccionAdd  && selectAdd)  selectAdd.value  = seleccionAdd;
+        if (seleccionEdit && selectEdit) selectEdit.value = seleccionEdit;
     }
 
 
-    async function CargarAPICategoria() {
+    async function CargarAPICategoria(preservarScroll = false) {
         const urlConInactivas = `${apiURL}&incluirInactivas=true`;
         try {
-            const res = await fetch(urlConInactivas);
+            const res = await fetch(urlConInactivas, { cache: 'no-store' });
             let data = {};
             try { data = await res.json(); } catch (_) { data = {}; }
 
             const categorias = Array.isArray(data) ? data : (data.registros || []);
             listaCategoriasGlobal = categorias;
 
-            renderizarCategorias(listaCategoriasGlobal);
+            renderizarCategorias(listaCategoriasGlobal, preservarScroll);
             renderizarSelectsCategorias(listaCategoriasGlobal);
         } catch (error) {
             console.error('error', error);
             listaCategoriasGlobal = [];
-            renderizarCategorias([]);
+            renderizarCategorias([], preservarScroll);
         }
     }
     CargarAPICategoria();
+    window.refrescarCategorias = CargarAPICategoria;
 
     /*LISTENERS GLOBALES*/
     if (!_categoriasDocListenersReady) {
@@ -146,7 +159,7 @@ function initCategorias() {
             if (btnDesactivar) {
                 const idTemp = btnDesactivar.dataset.id;
                 try {
-                    const res = await fetch(apiURLProductos);
+                    const res = await fetch(apiURLProductos, { cache: 'no-store' });
                     let data = {};
                     try { data = await res.json(); } catch (_) { data = {}; }
                     const productos = Array.isArray(data) ? data : (data.registros || []);
@@ -192,7 +205,7 @@ function initCategorias() {
                 .then(res => res.json().then(d => ({ ok: res.ok, data: d })))
                 .then(({ ok, data }) => {
                     if (ok) {
-                        CargarAPICategoria();
+                        window.refrescarListasProductos();
                         mostrarNotificacion("¡Se ha modificado la categoría con éxito!", "success");
                     } else {
                         mostrarNotificacion(data.message || "No se pudo modificar la categoría", "error");
@@ -249,7 +262,7 @@ function initCategorias() {
             const idTemp = btnEliminarCat.dataset.id;
 
             try {
-                const res = await fetch(apiURLProductos);
+                const res = await fetch(apiURLProductos, { cache: 'no-store' });
                 let data = {};
                 try { data = await res.json(); } catch (_) { data = {}; }
                 const productos = Array.isArray(data) ? data : (data.registros || []);
@@ -284,7 +297,7 @@ function initCategorias() {
                 .then(res => res.json().then(d => ({ ok: res.ok, data: d })))
                 .then(({ ok, data }) => {
                     if (ok) {
-                        CargarAPICategoria();
+                        window.refrescarListasProductos();
                         mostrarNotificacion('¡Se ha eliminado la categoría con éxito!', 'success');
                     } else {
                         mostrarNotificacion(data.message || "No se pudo eliminar la categoría", "error");
@@ -363,8 +376,9 @@ function initCategorias() {
                     document.getElementById('descripcion-categoria').value = '';
                     document.getElementById('url-imagen').value            = '';
 
+                    _paginaCatActual = 1;
                     mostrarNotificacion("¡Se ha agregado la categoría con éxito!", "success");
-                    CargarAPICategoria();
+                    window.refrescarListasProductos();
                 })
                 .catch(error => {
                     console.error(error);
@@ -429,7 +443,7 @@ function initCategorias() {
                     }
                     if (modalEditar.open) modalEditar.close();
                     mostrarNotificacion("¡Se ha modificado la categoría con éxito!", "success");
-                    CargarAPICategoria();
+                    window.refrescarListasProductos();
                 })
                 .catch(error => {
                     console.error(error);
@@ -454,5 +468,5 @@ function initCategorias() {
     }
 
 
-    window.registerPoll(CargarAPICategoria, 5000);
+    window.registerPoll(() => CargarAPICategoria(true), 5000, { ignoreModals: true });
 }

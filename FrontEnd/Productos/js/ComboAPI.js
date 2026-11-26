@@ -58,13 +58,15 @@ function initCombo() {
         return detalles;
     }
 
-    function renderizarCombos(registros) {
+    function renderizarCombos(registros, preservarScroll = false) {
         if (!contenedor) return;
-        contenedor.innerHTML = "";
+
+        const scrollY = window.scrollY;
 
         if (!registros || registros.length === 0) {
             contenedor.innerHTML = `<p class="no-results" style="padding:20px; text-align:center; width:100%;">No se encontraron combos.</p>`;
             renderPaginacion(document.getElementById('paginacion-combos'), 1, 0, COMBOS_POR_PAGINA, () => {});
+            if (preservarScroll) window.scrollTo(0, scrollY);
             return;
         }
 
@@ -83,6 +85,7 @@ function initCombo() {
             const esActivo          = item.activo == 0 ? 'innactivo' : 'activo';
             const claseActivo       = item.activo == 0 ? 'inactivo' : 'activo';
             const cambiarEstadoBtn  = item.activo == 1 ? 'desactivar' : 'activar';
+            const varianteEstadoBtn = cambiarEstadoBtn === 'activar' ? 'btn-ui--success' : 'btn-ui--ghost';
             const textoEstadoVisual = item.activo == 0 ? 'Innactivo' : 'Activo';
 
             let detallesContent = "";
@@ -117,9 +120,9 @@ function initCombo() {
                         <div class="card-estado ${claseActivo}">${textoEstadoVisual}</div>
                     </div>
                     <div class="card-actions">
-                        <div class="btn btn-edit button-editar btn-combo-edit" data-id="${item.id_combo}" id="editar-combo">Editar</div>
-                        <div class="btn btn-${cambiarEstadoBtn} btn-${cambiarEstadoBtn}-combo" data-id="${item.id_combo}">${cambiarEstadoBtn}</div>
-                        <div class="btn btn-borrar-Combo" data-id="${item.id_combo}">Eliminar</div>
+                        <div class="btn btn-ui btn-ui--tertiary btn-edit button-editar btn-combo-edit" data-id="${item.id_combo}" id="editar-combo">Editar</div>
+                        <div class="btn btn-ui ${varianteEstadoBtn} btn-${cambiarEstadoBtn} btn-${cambiarEstadoBtn}-combo" data-id="${item.id_combo}">${cambiarEstadoBtn}</div>
+                        <div class="btn btn-ui btn-ui--secondary btn-borrar-Combo" data-id="${item.id_combo}">Eliminar</div>
                     </div>
                 </div>
             `;
@@ -134,21 +137,23 @@ function initCombo() {
             porPagina,
             (p) => { _paginaComboActual = p; renderizarCombos(_combosMostrados); }
         );
+
+        if (preservarScroll) window.scrollTo(0, scrollY);
     }
 
     window.addEventListener('resize', () => {
         if (_combosMostrados.length > 0) renderizarCombos(_combosMostrados);
     });
 
-    async function cargarAPICombo() {
+    async function cargarAPICombo(preservarScroll = false) {
         const apiMeta = `${API_BASE}/meta.php?entity=combo`;
 
         try {
-            const response = await fetch(apiMeta);
+            const response = await fetch(apiMeta, { cache: 'no-store' });
 
             if (response.status === 404) {
                 _comboState.todosLosCombos = [];
-                renderizarCombos([]);
+                renderizarCombos([], preservarScroll);
                 return;
             }
 
@@ -156,18 +161,19 @@ function initCombo() {
 
             const data = await response.json();
             _comboState.todosLosCombos = data.registros || data || [];
-            renderizarCombos(_comboState.todosLosCombos);
+            renderizarCombos(_comboState.todosLosCombos, preservarScroll);
 
         } catch (error) {
             console.error('Error al cargar los datos:', error);
             _comboState.todosLosCombos = [];
-            renderizarCombos([]);
+            renderizarCombos([], preservarScroll);
         }
     }
 
     // Guardar refs para listeners persistentes
     _comboState.cargarAPI = cargarAPICombo;
     _comboState.render    = renderizarCombos;
+    window.refrescarCombos = cargarAPICombo;
 
     /*FILTROS DE BÚSQUEDA*/
     if (inputSearch) {
@@ -217,7 +223,7 @@ function initCombo() {
 
         async function cargarProductosParaModal() {
             try {
-                const response = await fetch(apirurlProductos);
+                const response = await fetch(apirurlProductos, { cache: 'no-store' });
                 const data = await response.json();
                 productosOriginales = data.registros || data || [];
                 actualizarSelect(productosOriginales);
@@ -238,6 +244,7 @@ function initCombo() {
         }
 
         cargarProductosParaModal();
+        window.recargarProductosCombo = cargarProductosParaModal;
     }
 
     /*FILTRO MODAL EDITAR*/
@@ -275,7 +282,7 @@ function initCombo() {
 
         async function cargarProductosParaModalEdit() {
             try {
-                const response = await fetch(apirurlProductos);
+                const response = await fetch(apirurlProductos, { cache: 'no-store' });
                 const data = await response.json();
                 productosOriginalesEdit = data.registros || data || [];
                 actualizarSelectEdit(productosOriginalesEdit);
@@ -296,6 +303,7 @@ function initCombo() {
         }
 
         cargarProductosParaModalEdit();
+        window.recargarProductosComboEdit = cargarProductosParaModalEdit;
     }
 
     /* LIMPIAR MODALES*/
@@ -352,6 +360,18 @@ function initCombo() {
     if (!_comboDocReady) {
         _comboDocReady = true;
 
+        /* --- Refrescar el desplegable de productos al abrir un modal de combo --- */
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#agregar-combos') &&
+                typeof window.recargarProductosCombo === 'function') {
+                window.recargarProductosCombo();
+            }
+            if (e.target.closest('.btn-combo-edit') &&
+                typeof window.recargarProductosComboEdit === 'function') {
+                window.recargarProductosComboEdit();
+            }
+        });
+
         /* --- Abrir modal editar combo --- */
         document.addEventListener('click', async (e) => {
             const btnEditarCombo = e.target.closest('.btn-combo-edit');
@@ -369,7 +389,7 @@ function initCombo() {
 
             const apiComboId = `${_comboState.apiUrls.combo}&id=${idCombo}`;
             try {
-                const res  = await fetch(apiComboId);
+                const res  = await fetch(apiComboId, { cache: 'no-store' });
                 const data = await res.json();
 
                 const inputNombre = document.getElementById('nombreCombo-edit');
@@ -390,7 +410,7 @@ function initCombo() {
                         let nombreProd = item.producto_nombre || "Producto";
                         if (!item.producto_nombre) {
                             try {
-                                const resProd  = await fetch(`${_comboState.apiUrls.prod}&id=${item.id_producto}`);
+                                const resProd  = await fetch(`${_comboState.apiUrls.prod}&id=${item.id_producto}`, { cache: 'no-store' });
                                 const prodData = await resProd.json();
                                 if (prodData.nombre) nombreProd = prodData.nombre;
                             } catch (err) { console.error(err); }
@@ -410,7 +430,7 @@ function initCombo() {
                                 <td>${cantidad}</td>
                                 <td>${precioInd.toFixed(2)}</td>
                                 <td>${totalFila.toFixed(2)}</td>
-                                <td><button type="button" class="btn btn-cancelar-fila-edit" data-total="${totalFila.toFixed(2)}">Cancelar</button></td>
+                                <td><button type="button" class="btn btn-ui btn-ui--secondary btn-cancelar-fila-edit" data-total="${totalFila.toFixed(2)}">Cancelar</button></td>
                             </tr>
                         `;
                         bodyContent.insertAdjacentHTML('beforeend', contentList);
@@ -468,7 +488,7 @@ function initCombo() {
             .then(res => res.json().then(d => ({ ok: res.ok, data: d })))
             .then(({ ok, data }) => {
                 if (ok) {
-                    if (_comboState.cargarAPI) _comboState.cargarAPI();
+                    window.refrescarListasProductos();
                     mostrarNotificacion("¡Se ha modificado el combo con éxito!", "success");
                 } else {
                     mostrarNotificacion(data.message || "No se pudo modificar el combo", "error");
@@ -525,7 +545,7 @@ function initCombo() {
 
                 if (res.ok) {
                     mostrarNotificacion(data.message || "Combo eliminado exitosamente", "success");
-                    if (_comboState.cargarAPI) _comboState.cargarAPI();
+                    window.refrescarListasProductos();
                 } else {
                     mostrarNotificacion(data.message || "No se pudo eliminar el combo", "error");
                 }
@@ -557,7 +577,7 @@ function initCombo() {
             if (!inputSelectProd) { mostrarNotificacion("Selecciona un producto válido", "error"); return; }
             if (!cantidad || cantidad <= 0) { mostrarNotificacion("Ingresa una cantidad válida", "error"); return; }
 
-            fetch(`${apirurlProductos}&id=${inputSelectProd}`)
+            fetch(`${apirurlProductos}&id=${inputSelectProd}`, { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.nombre === undefined) {
@@ -591,7 +611,7 @@ function initCombo() {
                             <td>${cantidad}</td>
                             <td>${precioNum.toFixed(2)}</td>
                             <td>${total.toFixed(2)}</td>
-                            <td><button type="button" class="btn btn-cancelar-fila" data-total="${total.toFixed(2)}">Cancelar</button></td>
+                            <td><button type="button" class="btn btn-ui btn-ui--secondary btn-cancelar-fila" data-total="${total.toFixed(2)}">Cancelar</button></td>
                         </tr>
                     `;
                     bodyContent.innerHTML += contentList;
@@ -685,9 +705,10 @@ function initCombo() {
                 const res = await fetch(apirurlCombos, { method: 'POST', body: formData });
                 const resultado = await res.json();
                 if (res.ok) {
+                    _paginaComboActual = 1;
                     mostrarNotificacion(resultado.message, "success");
                     limpiarModalCombo();
-                    cargarAPICombo();
+                    window.refrescarListasProductos();
                 } else {
                     mostrarNotificacion(resultado.message, "error");
                 }
@@ -746,7 +767,7 @@ function initCombo() {
             if (!cantidad || cantidad <= 0) { mostrarNotificacion("Ingresa una cantidad válida", "error"); return; }
 
             try {
-                const res  = await fetch(`${apirurlProductos}&id=${inputSelectProd}`);
+                const res  = await fetch(`${apirurlProductos}&id=${inputSelectProd}`, { cache: 'no-store' });
                 const data = await res.json();
                 if (!data || !data.nombre) {
                     mostrarNotificacion("Producto no encontrado", "error");
@@ -775,7 +796,7 @@ function initCombo() {
                         <td>${cantidad}</td>
                         <td>${precioNum.toFixed(2)}</td>
                         <td>${totalFila.toFixed(2)}</td>
-                        <td><button type="button" class="btn btn-cancelar-fila-edit" data-total="${totalFila.toFixed(2)}">Cancelar</button></td>
+                        <td><button type="button" class="btn btn-ui btn-ui--secondary btn-cancelar-fila-edit" data-total="${totalFila.toFixed(2)}">Cancelar</button></td>
                     </tr>
                 `;
                 bodyContent.insertAdjacentHTML('beforeend', contentList);
@@ -848,7 +869,7 @@ function initCombo() {
                 if (res.ok) {
                     mostrarNotificacion(resultado.message || "Combo actualizado con éxito", "success");
                     limpiarModalComboEdit();
-                    cargarAPICombo();
+                    window.refrescarListasProductos();
                 } else {
                     mostrarNotificacion(resultado.message || "Error al actualizar el combo", "error");
                 }
@@ -857,7 +878,7 @@ function initCombo() {
                 mostrarNotificacion("Error de conexión con el servidor", "error");
             }
         });
-        window.registerPoll(cargarAPICombo, 5000);
+        window.registerPoll(() => cargarAPICombo(true), 5000, { ignoreModals: true });
     }
 
     cargarAPICombo();
